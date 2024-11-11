@@ -149,7 +149,6 @@ def summarize(text):
 
 
 def make_record(question):
-    logger.info("Question: %s", question)
     record = {
         "question": question,
         "ground_truths": [],
@@ -192,7 +191,8 @@ def make_dataset():
 
     dataset = []
 
-    for question in questions:
+    for i, question in enumerate(questions):
+        logger.info("Question %s: %s", i, question)
         try:
             record = make_record(question)
         except Exception:
