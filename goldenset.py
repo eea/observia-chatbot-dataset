@@ -1,12 +1,13 @@
 #!/bin/env python3
 
+"""Based on a list of questions, produces a "goldenset" of danswer records"""
+
 from langchain_together.chat_models import ChatTogether
 from langchain.schema import HumanMessage
 import logging
 import json
 import requests
 from collections import namedtuple
-# import pdb
 
 
 logger = logging.getLogger("qa")
@@ -39,7 +40,6 @@ def get_login_cookie():
         "grant_type": "",
     }
     resp = requests.post(url, data)
-    # import pdb; pdb.set_trace()
     cookie = resp.headers["set-cookie"]
     return cookie
 

@@ -1,3 +1,5 @@
+"""Given a dataset json file, it filters records that are not in English"""
+
 import json
 import sys
 from langid.langid import LanguageIdentifier, model

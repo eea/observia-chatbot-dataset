@@ -1,98 +1,50 @@
-What is ECMWF’s main focus in weather prediction?
-How does ECMWF use satellite data to improve weather forecasts?
-What is the Integrated Forecasting System (IFS), and why is it important?
-How does ECMWF’s seasonal forecasting work, and how does it help people?
-What are large-scale vs. convective precipitation in ECMWF’s models?
-How does ECMWF account for aerosols in weather forecasts?
-What’s the resolution of ECMWF’s weather models, and how often are they updated?
-How does ECMWF predict extreme weather events, like floods or heatwaves?
-How does ECMWF’s supercomputer support weather predictions?
-How does ECMWF improve sea-level predictions with radar altimeter data?
-What is the main goal of the Copernicus Atmosphere Monitoring Service (CAMS)?
-How does CAMS use satellite data to predict air quality?
-What are CAMS’s main focus areas in its global system, especially related to aerosols?
-How does CAMS support policymakers, and what key policy products does it provide?
-How does CAMS interact with its users, and what are the goals of its user activities?
-What criteria does CAMS use to select projects for its Use Cases?
-How does CAMS track and forecast greenhouse gases like carbon dioxide and methane?
-What role does CAMS play in monitoring SO₂ emissions from volcanic eruptions?
-How does CAMS support new applications, and what is the goal of its Use Cases projects?
-What is the main goal of the Copernicus Climate Change Service (C3S)?
-Who uses C3S, and how do they make use of its data and tools?
-What is the Climate Data Store (CDS), and how does it help C3S with its mission?
-How does C3S ensure its climate data is accurate and reliable?
-What role does the European Centre for Medium-Range Weather Forecasts (ECMWF) play in running C3S?
-How does C3S help the EU with climate adaptation and mitigation efforts?
-What types of tenders and contracts does C3S offer to support its work?
-How does C3S engage with users and stakeholders to understand their needs and offer relevant services?
-How does C3S work with other Copernicus services, like the Atmosphere Monitoring Service?
-How does C3S support climate services and the use of climate data in policies and standards?
-What is the main goal of ECMWF's Medium-Range Flood Forecasting System?
-How does the system use medium-range weather forecasts to predict floods?
-How much advance notice do the flood warnings from this system provide?
-How does the system handle uncertainties in weather and water models?
-What role does the European Flood Awareness System (EFAS) play in this flood forecasting system?
-How does the system combine detailed local models with a broad view across Europe?
-What is the resolution of the hydrological model used in the flood forecasting system?
-How does the system use seasonal weather forecasts to predict river flow and water levels over seasons?
-What is the daily time scale of the hydrological data from this flood forecasting system?
-How does the system provide additional data to help interpret river flow and soil moisture levels?
-What are the main research areas of ECMWF's Copernicus Atmosphere Monitoring Service (CAMS) and Copernicus Climate Change Service (C3S)?
-How does ECMWF’s research in seasonal forecasting help improve sea level predictions?
-What challenges does ECMWF face when using machine learning to improve CAMS’s air quality forecasts, and how are they being solved?
-How does ECMWF’s research in atmospheric composition data help improve CAMS and C3S?
-What is ECMWF's Summer of Weather Code (ESoWC) initiative, and how does it help create better weather forecasting tools?
-How does ECMWF’s research on emissions help improve air quality forecasts and climate models for CAMS?
-What are the main research areas of ECMWF's research and evaluation services, and how do they support CAMS and C3S?
-How does ECMWF’s research in user experience help make CAMS and C3S websites more user-friendly?
-What challenges does ECMWF face when evaluating the impact of its research on the Copernicus program, and how are they addressing them?
-How does ECMWF’s research in reanalysis improve climate modeling and weather forecasting
-What is ECMWF’s role in working with other countries to improve weather forecasting and climate prediction?
-How does ECMWF work with other international organizations like the European Space Agency (ESA) and EUMETSAT?
-What is the agreement between ECMWF and the Union for the Mediterranean (UfM) about using EU Copernicus services?
-How does ECMWF cooperate with Mercator Ocean to provide ocean data and support the Copernicus Marine Service?
-What is the Data Information Access Service (DIAS) project, and how does it help ECMWF, EUMETSAT, and Mercator Ocean work together?
-How does ECMWF work with the European Commission on the Copernicus Programme and the European Green Deal?
-What is ECMWF’s role in supporting international organizations like the World Meteorological Organization and the IPCC?
-How does ECMWF’s international cooperation help develop new weather forecasting products and encourage innovation?
-How does ECMWF’s international work help achieve the European Green Deal’s goals, like reducing greenhouse gas emissions by 55% by 2030?
-What are the goals of the CAMS_94 contract in understanding user needs and creating services based on them?
-How does ECMWF ensure users get the most out of its products and are satisfied?
-What role does the User Advisory Board (UAB) play in improving C3S services and involving tourism experts?
-How does ECMWF collect feedback and understand user needs through workshops and service providers?
-What is the National Collaboration Programme (NCP) in the Copernicus Marine Service, and how does it increase user adoption?
-How does ECMWF use user engagement to boost satisfaction, encourage new uses of data, and offer training for the Climate Data Store (CDS)?
-What is the purpose of the C3S User Engagement Workshop with the Belgian community in learning about C3S services and user needs?
-How does ECMWF work with national climate services and academic communities to improve C3S?
-What are the User Intelligence and Uptake sessions in the C3S NCP, and how do they improve Copernicus services?
-How does ECMWF ensure its user engagement is based on real needs and use feedback to guide service development?
-How does ECMWF help health workers understand the effects of climate change on health?
-What is the Copernicus Health Hub, and how does it provide useful information for policymakers on climate and health?
-How does climate change impact human health, and what are the biggest health risks from extreme weather?
-What role does the European Health Service play in providing climate information for health?
-How does ECMWF use Earth observation data to create products that help the health sector?
-What are the challenges in adapting to health risks from climate change, and how can climate services help?
-How does ECMWF’s Climate Change Service (C3S) provide health-related climate information, and what has recent research found?
-Why are heatwaves in Europe important, and how can climate services help develop heat health action plans?
-How does ECMWF’s Atmosphere Monitoring Service (CAMS) provide air quality and climate data, and what does this mean for health?
-What are the main health challenges from climate change, and how can ECMWF’s data and tools help decision-making?
-What is ECMWF's role in the Copernicus Programme, and how does it help with Earth observation?
-How does ECMWF's Copernicus Atmosphere Monitoring Service (CAMS) track and predict air quality?
-What is the Copernicus Climate Change Service (C3S), and how does ECMWF run it?
-How does ECMWF use Earth observation data to show climate change and its effects?
-What is the Global Land and Marine Observations Database, and how does it help ECMWF with Earth observation?
-How does ECMWF work with other organizations, like Mercator Ocean, to improve Earth observation and climate research?
-What role does ECMWF's supercomputer play in Earth observation and climate modeling?
-How does ECMWF’s Copernicus Emergency Management Service (CEMS) use Earth observation data to help with emergency response?
-What is the Copernicus Observations Workshop, and how does it help develop Earth observation at ECMWF?
-How do ECMWF’s research and development activities improve Earth observation and climate science?
-What is the capacity of ECMWF’s supercomputer, and how much can Member States use for their own needs?
-How does ECMWF use its supercomputer to support weather forecasting and climate prediction?
-Where is ECMWF’s supercomputer located, and are there other computing centers or offices elsewhere?
-How does ECMWF’s supercomputer compare to others in Europe in terms of size and capacity?
-What type of data is stored in ECMWF’s supercomputer data archive?
-How does ECMWF ensure the security and integrity of data in its supercomputer facility?
-What role does the supercomputer play in ECMWF’s research and development?
-How does ECMWF work with organizations like Mercator Ocean on supercomputing and data sharing?
-What are the advantages of using a cloud platform like the Data Information Access Service (DIAS) for handling large data?
-How does ECMWF plan to expand or upgrade its supercomputer to meet future needs in weather forecasting and climate prediction?
+What months have the highest and lowest sea-ice areas in the Arctic?
+What are the benefits of using the WAVEFLOW model for ocean monitoring?
+How does the new method handle vertical observations of sea ice concentration?
+What are the effects of extreme water levels on coastal communities and ecosystems?
+What kind of data do Green Ocean models rely on?
+Is Europe experiencing more heat stress during summers?
+How does the GLOPHYTS project monitor phytoplankton function types?
+What is the representative depth of SEVIRI SST analysis?
+How does the MultiRes project use Sentinel-2 and Sentinel-3 data?
+What is the Copernicus Ocean State Report and what does it cover?
+What is the coherence indicator in ground motion service?
+Is the Arctic getting warmer or colder?
+What are the effects of a volcanic eruption on the environment?
+How do I access the Integrated Global Radiosounding Archive data?
+What is the role of the PI and organization in the BIOPTIMOD project?
+How can forecasting services help manage storm water in coastal areas?
+What is the OceanPredict Symposium and what is its purpose?
+What are the potential applications of the LMTL model in conservation efforts?
+What tools are used for monitoring crop growth and yield forecasting?
+What is the current sea surface temperature in the North Sea?
+What is the relationship between the ECMWF and the EU's Copernicus programme?
+What is the role of CMEMS in monitoring ocean temperatures?
+What role does renewable energy play in the blue economy?
+What is the purpose of the Copernicus Emergency Management Service?
+What is the temporal resolution of the in-situ meteorological observations?
+How can the GENOA project improve the estimation of upper ocean properties?
+What is the global sea level measured by satellite?
+What is the goal of the Marine Strategy Framework Directive?
+How often are lake water quality observations updated?
+What are the latest updates to the CMEMS products?
+What are the sources of global temperature datasets?
+What is the impact of the PFT algorithm recalibration on the datasets?
+What is the role of sensor data in oceanic research and development?
+How do climate projections help us understand future climate change?
+What are the key landscapes for conservation in the Caribbean?
+What is the purpose of cookies on the Copernicus website?
+What is the resolution of the Imperviousness Density datasets available for Europe?
+How often are the CLMS global datasets updated?
+What are the effects of climate change on regional seas?
+How do satellites help monitor volcanic eruptions?
+What is the global distribution of ocean nutrients?
+How does the Copernicus Climate Change Service track global temperatures?
+What does the Sahara desert look like from space?
+How can climate services help mitigate the effects of extreme weather on health?
+What is the current carbon level in the global ocean?
+What is the impact of climate change on Antarctic ice?
+What is the main goal of the SOSSTA project in ocean monitoring?
+How does the COMBAT project aim to improve coastal data extraction?
+What type of data does the High Resolution Image Mosaic 2012 provide?
+How does the EUSSO support ocean monitoring?
