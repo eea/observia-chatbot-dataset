@@ -21,7 +21,36 @@ out_dataset_path = "datasets/EEA Website.json"
 out_questions_path = f"datasets/EEA Website.txt-{n_clusters}.txt"
 
 
+# model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+# model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
+
+# max context size that can be passed to the LLM
+max_length_questiongen_prompt = 10000  # 4096
+
 TOGETHERAI_API_KEY = ""
+
+questiongen_prompt = """Topic: {topic}
+
+Content of documents:
+{documents}
+
+Generated questions:
+"""
+
+
+sys_message = """I'm building a dataset of representative questions that a website visitor might ask.
+We're using our documents to build a set of "topics keywords" that represent our documents.
+I will provide a topic and the text for the document, your task is to generate a question
+that a user might ask, related to that topic, that may find its answer in our document.
+Make the question as human as possible and keep it short and not too specific, even if it's not comprehensive,
+as the users don't like to type a lot.
+It is important to keep the questions centered around the given topic keywords.
+Don't generate questions that are really specific to a place or project.
+Generate maximum 5 questions.
+The answer should be simple text, no introduction, just one question per line.
+Don't use dashes at the beginning of lines.
+On the last line, extract a topic that summarizes the provided keywords, in the format: Topic: <topic>
+"""
 
 
 def load_env():
@@ -33,8 +62,19 @@ def load_env():
 load_env()
 assert TOGETHERAI_API_KEY
 
+client = openai.OpenAI(
+    api_key=TOGETHERAI_API_KEY,
+    base_url="https://api.together.xyz/v1",
+)
 
-def process_json_files(directory, callback):
+
+def make_corpus(directory):
+    documents = []
+
+    def callback(fd):
+        data = json.load(fd)
+        documents.append(data["fields"].get("content", ""))
+
     # Ensure the directory exists
     if not os.path.isdir(directory):
         raise ValueError(
@@ -53,61 +93,38 @@ def process_json_files(directory, callback):
                 except Exception as e:
                     print(f"Error processing {filename}: {e}")
 
-
-documents = []
-
-
-def read_content(fd):
-    data = json.load(fd)
-    documents.append(data["fields"].get("content", ""))
+    return documents
 
 
-process_json_files(path, read_content)
-len(documents)
-client = openai.OpenAI(
-    api_key=TOGETHERAI_API_KEY,
-    base_url="https://api.together.xyz/v1",
-)
+def make_topic_model(documents):
+    if n_clusters:
+        cluster_model = KMeans(n_clusters=n_clusters)
+    else:
+        cluster_model = HDBSCAN(
+            min_cluster_size=auto_min_cluster_size,
+            metric="euclidean",
+            cluster_selection_method="eom",
+            prediction_data=True,
+        )
 
-if n_clusters:
-    cluster_model = KMeans(n_clusters=n_clusters)
-else:
-    cluster_model = HDBSCAN(
-        min_cluster_size=auto_min_cluster_size,
-        metric="euclidean",
-        cluster_selection_method="eom",
-        prediction_data=True,
+    # Pre-calculate embeddings
+    embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+    embeddings = embedding_model.encode(documents, show_progress_bar=True)
+
+    representation_model = KeyBERTInspired()
+    topic_model = BERTopic(
+        representation_model=representation_model,
+        embedding_model=embedding_model,
+        hdbscan_model=cluster_model,
     )
+    topics, probs = topic_model.fit_transform(documents, embeddings)
 
-# Pre-calculate embeddings
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-embeddings = embedding_model.encode(documents, show_progress_bar=True)
+    for topic_id in topic_model.topic_representations_.keys():
+        topics_data = topic_model.topic_representations_[topic_id]
+        topic = ", ".join([x[0] for x in topics_data])
+        print(topic)
 
-representation_model = KeyBERTInspired()
-topic_model = BERTopic(
-    representation_model=representation_model,
-    embedding_model=embedding_model,
-    hdbscan_model=cluster_model,
-)
-topics, probs = topic_model.fit_transform(documents, embeddings)
-
-for topic_id in topic_model.topic_representations_.keys():
-    topics_data = topic_model.topic_representations_[topic_id]
-    topic = ", ".join([x[0] for x in topics_data])
-    print(topic)
-
-
-prompt = """Topic: {topic}
-
-Content of documents:
-{documents}
-
-Generated questions:
-"""
-
-max_prompt = 10000  # 4096
-# model = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
-# model = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo
+    return topic_model
 
 
 def make_llm_call(
@@ -129,10 +146,12 @@ def get_questions(topic_model, topic_id, sys_message, model):
     topics_data = topic_model.topic_representations_[topic_id]
     topic = ", ".join([x[0] for x in topics_data])
     docs = topic_model.representative_docs_[topic_id]
-    local_prompt = prompt[:]
+    local_prompt = questiongen_prompt[:]
     local_prompt = local_prompt.replace("{topic}", topic)
     max_docs_chars = (
-        max_prompt - len(sys_message) - len(local_prompt.replace("{documents}", ""))
+        max_length_questiongen_prompt
+        - len(sys_message)
+        - len(local_prompt.replace("{documents}", ""))
     )
     docs = "\n\n".join(docs)[:max_docs_chars]
     local_prompt = local_prompt.replace("{documents}", docs)
@@ -143,29 +162,21 @@ def get_questions(topic_model, topic_id, sys_message, model):
     return (questions, docs, topic)
 
 
-sys_message = """I'm building a dataset of representative questions that a website visitor might ask.
-We're using our documents to build a set of "topics keywords" that represent our documents.
-I will provide a topic and the text for the document, your task is to generate a question
-that a user might ask, related to that topic, that may find its answer in our document.
-Make the question as human as possible and keep it short and not too specific, even if it's not comprehensive,
-as the users don't like to type a lot.
-It is important to keep the questions centered around the given topic keywords.
-Don't generate questions that are really specific to a place or project.
-Generate maximum 5 questions.
-The answer should be simple text, no introduction, just one question per line.
-Don't use dashes at the beginning of lines.
-On the last line, extract a topic that summarizes the provided keywords, in the format: Topic: <topic>
-"""
-
-
 def get_primary_question(questions):
-    sys_message = """I will provide a set of 5 questions, they are very similar. Your task is to identify the most interesting question and simply print it again, no preamble or other introductory text needed. The questions are:"""
+    sys_message = """
+I will provide a set of 5 questions, they are very similar.
+Your task is to identify the most interesting question and simply print it
+again, no preamble or other introductory text needed. The questions are:
+"""
     text = "\n".join(questions)
     question = make_llm_call(
         sys_message, text, "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
     )
     return question
 
+
+documents = make_corpus(path)
+topic_model = make_topic_model(documents)
 
 dataset = []
 primary_questions = []
@@ -184,6 +195,7 @@ for topic_id in topic_model.topic_representations_.keys():
             qs.append(line)
     record = {"keywords": topic_keywords, "questions": qs, "topic": topic}
     dataset.append(record)
+
     print("Topic id: %s" % topic_id)
     print("Topic keywords: %s" % topic_keywords)
     print("Topic: %s" % topic)
@@ -197,7 +209,7 @@ with open(out_dataset_path, "w") as f:
 
 with open(out_questions_path, "w") as f:
     f.write("\n".join(primary_questions))
+
 pqs = [p[0] for p in primary_questions]
 with open(out_questions_path, "w") as f:
     f.write("\n".join(pqs))
-pqs
