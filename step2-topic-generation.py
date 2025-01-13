@@ -225,4 +225,4 @@ if __name__ == "__main__":
 
     print(f"Writing output file {args.output}")
     with open(args.output, "w") as f:
-        json.dump(dataset, f)
+        json.dump(dataset, f, indent=2)

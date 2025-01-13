@@ -180,13 +180,7 @@ def make_record(question):
     return record
 
 
-def make_dataset():
-    questions = []
-    with open("./questions.txt") as f:
-        for line in f.readlines():
-            if line.strip() and not line.startswith("#"):
-                questions.append(line.strip())
-
+def make_dataset(questions):
     logger.info(f"Processing {len(questions)} questions")
 
     dataset = []
@@ -233,6 +227,12 @@ Ground truth:
 
 
 if __name__ == "__main__":
+    questions = []
+    with open("./questions.txt") as f:
+        for line in f.readlines():
+            if line.strip() and not line.startswith("#"):
+                questions.append(line.strip())
+
     dataset = make_dataset()
     out = {"question": [], "answer": [], "contexts": [], "ground_truths": []}
     for line in dataset:

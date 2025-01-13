@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import json
 import os
 
@@ -22,10 +23,10 @@ db_config = {
     "user": "postgres",
     "password": "password",
     "host": "10.50.5.60",
-    "port": 59124
+    "port": 59124,
 }
 
-EMPTY = ['no-document-set']
+EMPTY = ["no-document-set"]
 
 
 def extract_document_ids():
@@ -41,13 +42,15 @@ def extract_document_ids():
             # print(f"ID: {row.id}")
             ids.append(row.id)
 
-    with open("document_ids.json", "w") as f:
-        json.dump(ids, f)
+    # with open("document_ids.json", "w") as f:
+    #     json.dump(ids, f)
 
     conn.close()
 
+    return ids
 
-def download_document(document_id, session):
+
+def download_document(document_id, session, base_path):
     query = f"""
         select *
         from sources *
@@ -63,32 +66,41 @@ def download_document(document_id, session):
     assert response.is_successful()
     data = response.get_json()
 
-    for chunk in data['root'].get('children', []):
-        for document_set in chunk['fields'].get('document_sets', EMPTY):
-            parent = os.path.join('data-download', document_set)
+    for chunk in data["root"].get("children", []):
+        for document_set in chunk["fields"].get("document_sets", EMPTY):
+            # TODO: take into account that some document sets are URLs
+            parent = os.path.join(base_path, document_set)
             if not os.path.exists(parent):
                 os.makedirs(parent)
             fname = f"{chunk['id']}.json"
-            with open(os.path.join(parent, fname), 'w') as f:
+            with open(os.path.join(parent, fname), "w") as f:
                 json.dump(chunk, f)
                 # print(f"Downloaded {chunk['id']}")
 
 
-def download_database():
+def download_database(base_path):
     print("Extracting document ids")
-    extract_document_ids()
 
-    document_ids = None
+    document_ids = extract_document_ids()
 
-    with open('document_ids.json') as f:
-        document_ids = json.load(f)
+    # with open("document_ids.json") as f:
+    #     document_ids = json.load(f)
 
     print(f"Got {len(document_ids)} documents")
 
     for i in tqdm(range(len(document_ids)), desc="Downloading documents"):
         with app.syncio() as session:
             doc_id = document_ids[i]
-            download_document(doc_id, session)
+            download_document(doc_id, session, base_path)
+
+    print("Done")
+
 
 if __name__ == "__main__":
-    download_database()
+    parser = argparse.ArgumentParser(
+        description="Download document chunks from Postres and Vespa "
+    )
+    parser.add_argument("output", help="Output base folder.", default="data-download")
+    args = parser.parse_args()
+
+    download_database(args.output)
