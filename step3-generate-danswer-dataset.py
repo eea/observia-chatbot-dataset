@@ -2,11 +2,14 @@
 
 """Based on a list of questions, produces a "goldenset" of danswer records"""
 
-from langchain_together.chat_models import ChatTogether
-from langchain.schema import HumanMessage
+import argparse
 import logging
 import json
+
 import requests
+
+from langchain_together.chat_models import ChatTogether
+from langchain.schema import HumanMessage
 from collections import namedtuple
 
 
@@ -227,33 +230,26 @@ Ground truth:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Generate goldenset dataset based on Danswer"
+    )
+    parser.add_argument("input_file", help="Path to input questions text file")
+    parser.add_argument("output_file", help="Path to output dataset JSON file")
+
+    args = parser.parse_args()
+
     questions = []
-    with open("./questions.txt") as f:
+    with open(args.input_file) as f:
         for line in f.readlines():
             if line.strip() and not line.startswith("#"):
                 questions.append(line.strip())
 
-    dataset = make_dataset()
+    dataset = make_dataset(questions)
     out = {"question": [], "answer": [], "contexts": [], "ground_truths": []}
     for line in dataset:
         for k, v in line.items():
             out[k].append(v)
 
-    with open("./dataset.json", "w") as f:
+    with open(args.output_file, "w") as f:
         pretty = json.dumps(out, sort_keys=True, indent=2)
         f.write(pretty)
-
-
-# question = "List the case studies about the south region of Italy Apulia"
-# msg = get_answer_with_citation(question)
-# context_docs = msg["context_docs"]["top_documents"]
-# # array like {'1': 119530, '2': 119531}
-# citations = msg.citations
-# text = msg["message"]
-# pdb.set_trace()
-
-# with open("./out.jsonl", "w") as f:
-#     for line in lines:
-#         print(line)
-#         f.write(line)
-#         f.write("\n")
