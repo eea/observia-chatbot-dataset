@@ -48,7 +48,7 @@ TOGETHERAI_API_KEY = ""
 
 # TODO: use settings.json or conf.json, but not both
 def load_env():
-    with open("conf.json") as f:
+    with open("settings.json") as f:
         settings = json.load(f)
     globals().update(settings)
 
