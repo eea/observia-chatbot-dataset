@@ -10,22 +10,22 @@ The database connection information is hardcoded in the script, it may need adju
 python step1-download-vespa-database.py
 ```
 
-## Step 1.1: filter only English questions (optional)
-
-```bash
-python step1.1-filter-for-english.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-topics-en.json
-```
-
 ## Step 2: generate topic-based questions
 
 ```bash
 python step2-topic-generation.py data-download/GS_CEMS/ datasets/GS_CEMS-topics.json 200
 ```
 
-## Step 2.1: extract the questions to a new text file
+## Step 2.1: filter only English questions (optional)
 
 ```bash
-python step2.1-extract-primary-questions.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-questions.txt
+python step1.1-filter-for-english.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-topics-en.json
+```
+
+## Step 2.2: extract the questions to a new text file
+
+```bash
+python step2.1-extract-primary-questions.py datasets/GS_CEMS-topics-en.json datasets/GS_CEMS-questions.txt
 ```
 
 ## Step 3: generate GoldenSet dataset
