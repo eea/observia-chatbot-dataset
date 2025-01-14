@@ -5,7 +5,7 @@ from trulens.providers.openai import OpenAI
 from trulens.core import Feedback
 from trulens.apps.virtual import VirtualApp
 from trulens.core import TruSession
-from trulens.dashboard import run_dashboard
+from trulens.dashboard.run import run_dashboard
 from trulens.apps.virtual import TruVirtual
 
 
@@ -56,27 +56,30 @@ def load_dataset(paths):
 def load_trulens(data):
     virtual_app = VirtualApp()
 
-    context = VirtualApp.select_context()
-    # Question/statement relevance between question and each context chunk.
-    f_context_relevance = (
-        Feedback(provider.context_relevance_with_cot_reasons, name="Context Relevance")
-        .on_input()
-        .on(context)
-    )
-
-    # Define a groundedness feedback function
-    f_groundedness = (
-        Feedback(provider.groundedness_measure_with_cot_reasons, name="Groundedness")
-        .on(context.collect())
-        .on_output()
-    )
-
-    # Question/answer relevance between overall question and answer.
-    f_qa_relevance = Feedback(
-        provider.relevance_with_cot_reasons, name="Answer Relevance"
-    ).on_input_output()
-
     for name, df in data.items():
+        context = VirtualApp.select_context()
+        # Question/statement relevance between question and each context chunk.
+        f_context_relevance = (
+            Feedback(
+                provider.context_relevance_with_cot_reasons, name="Context Relevance"
+            )
+            .on_input()
+            .on(context)
+        )
+
+        # Define a groundedness feedback function
+        f_groundedness = (
+            Feedback(
+                provider.groundedness_measure_with_cot_reasons, name="Groundedness"
+            )
+            .on(context.collect())
+            .on_output()
+        )
+
+        # Question/answer relevance between overall question and answer.
+        f_qa_relevance = Feedback(
+            provider.relevance_with_cot_reasons, name="Answer Relevance"
+        ).on_input_output()
         virtual_recorder = TruVirtual(
             app_name="RAG",
             app_version=name,
@@ -87,7 +90,7 @@ def load_trulens(data):
 
     session = TruSession()
 
-    run_dashboard(session)
+    run_dashboard(session, port=8123, force=True)
 
 
 if __name__ == "__main__":
