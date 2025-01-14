@@ -46,6 +46,7 @@ Generated questions:
 TOGETHERAI_API_KEY = ""
 
 
+# TODO: use settings.json or conf.json, but not both
 def load_env():
     with open("conf.json") as f:
         settings = json.load(f)
@@ -226,3 +227,6 @@ if __name__ == "__main__":
     print(f"Writing output file {args.output}")
     with open(args.output, "w") as f:
         json.dump(dataset, f, indent=2)
+
+
+# TODO: allow multiple input folders

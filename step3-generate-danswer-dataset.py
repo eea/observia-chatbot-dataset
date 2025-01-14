@@ -137,18 +137,18 @@ def get_answer(question, persona_id):
     return rec
 
 
-def summarize(text):
-    prompt = f"""Summarize the following text. Retain all important aspects, but make the text shorter.
-
-{text}
-"""
-    llm = ChatTogether(
-        model_name=conf.llm_chat_model,
-        api_key=conf.llm_chat_key,
-        streaming=False,  # Disable streaming to get a simple text response
-    )
-    response = llm([HumanMessage(content=prompt)])
-    return response.content
+# def summarize(text):
+#     prompt = f"""Summarize the following text. Retain all important aspects, but make the text shorter.
+#
+# {text}
+# """
+#     llm = ChatTogether(
+#         model_name=conf.llm_chat_model,
+#         api_key=conf.llm_chat_key,
+#         streaming=False,  # Disable streaming to get a simple text response
+#     )
+#     response = llm([HumanMessage(content=prompt)])
+#     return response.content
 
 
 def make_record(question):

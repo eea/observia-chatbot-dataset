@@ -10,7 +10,7 @@ The database connection information is hardcoded in the script, it may need adju
 python step1-download-vespa-database.py
 ```
 
-## Step 1.1: filter only English questions
+## Step 1.1: filter only English questions (optional)
 
 ```bash
 python step1.1-filter-for-english.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-topics-en.json

@@ -33,13 +33,10 @@ def extract_document_ids():
     conn = psycopg.connect(**db_config, row_factory=namedtuple_row)
     ids = []
     with conn.cursor() as cur:
-        # Example query
         cur.execute("SELECT * FROM document")
         rows = cur.fetchall()
 
-        # Process results
         for row in rows:
-            # print(f"ID: {row.id}")
             ids.append(row.id)
 
     # with open("document_ids.json", "w") as f:
@@ -51,6 +48,7 @@ def extract_document_ids():
 
 
 def download_document(document_id, session, base_path):
+    # TODO: identify if chunk number is 400, to allow pagination.
     query = f"""
         select *
         from sources *
