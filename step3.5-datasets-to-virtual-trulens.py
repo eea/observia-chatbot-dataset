@@ -54,9 +54,8 @@ def load_dataset(paths):
 
 
 def load_trulens(data):
-    virtual_app = VirtualApp()
-
     for name, df in data.items():
+        virtual_app = VirtualApp()
         context = VirtualApp.select_context()
         # Question/statement relevance between question and each context chunk.
         f_context_relevance = (
