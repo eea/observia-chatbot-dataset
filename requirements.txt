@@ -128,23 +128,23 @@ langchain-together==0.2.0
 # language_data==1.3.0
 # lazy_loader==0.4
 # linkify-it-py==2.0.3
-# llama-cloud==0.1.4
-# llama-index==0.11.23
-# llama-index-agent-openai==0.3.4
-# llama-index-cli==0.3.1
-# llama-index-core==0.11.23
-# llama-index-embeddings-openai==0.2.5
-# llama-index-indices-managed-llama-cloud==0.4.0
-# llama-index-legacy==0.9.48.post4
-# llama-index-llms-openai==0.2.16
-# llama-index-llms-openai-like==0.2.0
-# llama-index-llms-together==0.2.0
-# llama-index-multi-modal-llms-openai==0.2.3
-# llama-index-program-openai==0.2.0
-# llama-index-question-gen-openai==0.2.0
-# llama-index-readers-file==0.3.0
-# llama-index-readers-llama-parse==0.3.0
-# llama-parse==0.5.13
+llama-cloud==0.1.4
+llama-index==0.11.23
+llama-index-agent-openai==0.3.4
+llama-index-cli==0.3.1
+llama-index-core==0.11.23
+llama-index-embeddings-openai==0.2.5
+llama-index-indices-managed-llama-cloud==0.4.0
+llama-index-legacy==0.9.48.post4
+llama-index-llms-openai==0.2.16
+llama-index-llms-openai-like==0.2.0
+llama-index-llms-together==0.2.0
+llama-index-multi-modal-llms-openai==0.2.3
+llama-index-program-openai==0.2.0
+llama-index-question-gen-openai==0.2.0
+llama-index-readers-file==0.3.0
+llama-index-readers-llama-parse==0.3.0
+llama-parse==0.5.13
 # llvmlite==0.43.0
 # locket==1.0.0
 # lxml==5.3.0
@@ -191,7 +191,7 @@ langchain-together==0.2.0
 # nvidia-nccl-cu12==2.21.5
 # nvidia-nvjitlink-cu12==12.4.127
 # nvidia-nvtx-cu12==12.4.127
-# openai==1.54.3
+openai==1.54.3
 # openpyxl==3.1.5
 # ordered-set==4.1.0
 # orjson==3.10.11
@@ -315,14 +315,14 @@ tqdm==4.67.0
 # transformers==4.46.2
 # triad==0.9.8
 # triton==3.1.0
-# trulens==1.2.6
-# trulens-apps-langchain==1.1.0
-# trulens-apps-llamaindex==1.2.6
-# trulens-core==1.2.6
-# trulens-dashboard==1.2.6
-# trulens-feedback==1.2.6
-# trulens-providers-openai==1.2.6
-# trulens_eval==1.2.6
+trulens==1.2.6
+trulens-apps-langchain==1.1.0
+trulens-apps-llamaindex==1.2.6
+trulens-core==1.2.6
+trulens-dashboard==1.2.6
+trulens-feedback==1.2.6
+trulens-providers-openai==1.2.6
+trulens_eval==1.2.6
 # typer==0.13.1
 # types-python-dateutil==2.9.0.20241003
 # typing-inspect==0.9.0
