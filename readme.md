@@ -34,6 +34,12 @@ python step2.1-extract-primary-questions.py datasets/GS_CEMS-topics-en.json data
 python step3-generate-danswer-dataset.py datasets/GS_CEMS-questions.txt datasets/GS_CEMS-goldenset.json
 ```
 
+## Step 3.5: load multiple goldenset-style datasets in local Trulens
+
+```bash
+python step3.5-dataset-to-virtual-trulens.py dataset.json datasets/GS_CEMS-goldenset.json
+```
+
 ## Step 4: convert GoldenSet to Excel
 
 ```bash
