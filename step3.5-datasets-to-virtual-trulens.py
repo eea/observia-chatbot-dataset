@@ -54,42 +54,65 @@ def load_dataset(paths):
 
 
 def load_trulens(data):
+    session = TruSession()
+    session.reset_database()
+
     for name, df in data.items():
         virtual_app = VirtualApp()
         context = VirtualApp.select_context()
         # Question/statement relevance between question and each context chunk.
-        f_context_relevance = (
-            Feedback(
-                provider.context_relevance_with_cot_reasons, name="Context Relevance"
-            )
-            .on_input()
-            .on(context)
-        )
+        # f_context_relevance = (
+        #     Feedback(
+        #         provider.context_relevance_with_cot_reasons, name="Context Relevance"
+        #     )
+        #     .on_input()
+        #     .on(context)
+        # )
+        #
+        # # Define a groundedness feedback function
+        # f_groundedness = (
+        #     Feedback(
+        #         provider.groundedness_measure_with_cot_reasons, name="Groundedness"
+        #     )
+        #     .on(context.collect())
+        #     .on_output()
+        # )
+        #
+        # # Question/answer relevance between overall question and answer.
+        # f_qa_relevance = Feedback(
+        #     provider.relevance_with_cot_reasons, name="Answer Relevance"
+        # ).on_input_output()
+        # f_in_coherence = Feedback(
+        #     provider.coherence_with_cot_reasons, name="Input Coherence"
+        # ).on_input()
 
-        # Define a groundedness feedback function
-        f_groundedness = (
-            Feedback(
-                provider.groundedness_measure_with_cot_reasons, name="Groundedness"
-            )
-            .on(context.collect())
-            .on_output()
-        )
+        # f_input_sentiment = Feedback(
+        #     provider.sentiment_with_cot_reasons, name="Input Sentiment"
+        # ).on_input()
+        #
+        # f_output_sentiment = Feedback(
+        #     provider.sentiment_with_cot_reasons, name="Output Sentiment"
+        # ).on_output()
 
-        # Question/answer relevance between overall question and answer.
-        f_qa_relevance = Feedback(
-            provider.relevance_with_cot_reasons, name="Answer Relevance"
-        ).on_input_output()
+        f_coherence = Feedback(
+            provider.coherence_with_cot_reasons, name="Coherence"
+        ).on_output()
+
         virtual_recorder = TruVirtual(
             app_name="RAG",
             app_version=name,
             app=virtual_app,
-            feedbacks=[f_context_relevance, f_groundedness, f_qa_relevance],
+            feedbacks=[
+                # f_in_coherence,
+                f_coherence,
+                # f_input_sentiment,
+                # f_output_sentiment,
+            ],
+            # feedbacks=[f_context_relevance, f_groundedness, f_qa_relevance],
         )
         virtual_recorder.add_dataframe(df)
 
-    session = TruSession()
-
-    run_dashboard(session, port=8123, force=True)
+    run_dashboard(session, port=8000, force=True)
 
 
 if __name__ == "__main__":
