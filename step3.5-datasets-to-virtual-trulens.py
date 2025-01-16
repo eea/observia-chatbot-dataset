@@ -53,205 +53,70 @@ def load_dataset(paths):
     return out
 
 
-def load_trulens(data):
-
-
-
-    session = TruSession()
-    session.reset_database()
-
-    for name, df in data.items():
-        virtual_app = VirtualApp()
-        context = VirtualApp.select_context()
-        # Question/statement relevance between question and each context chunk.
-        # f_context_relevance = (
-        #     Feedback(
-        #         provider.context_relevance_with_cot_reasons, name="Context Relevance"
-        #     )
-        #     .on_input()
-        #     .on(context)
-        # )
-        #
-        # # Define a groundedness feedback function
-        # f_groundedness = (
-        #     Feedback(
-        #         provider.groundedness_measure_with_cot_reasons, name="Groundedness"
-        #     )
-        #     .on(context.collect())
-        #     .on_output()
-        # )
-        #
-        # # Question/answer relevance between overall question and answer.
-        # f_qa_relevance = Feedback(
-        #     provider.relevance_with_cot_reasons, name="Answer Relevance"
-        # ).on_input_output()
-        # f_in_coherence = Feedback(
-        #     provider.coherence_with_cot_reasons, name="Input Coherence"
-        # ).on_input()
-
-        # f_input_sentiment = Feedback(
-        #     provider.sentiment_with_cot_reasons, name="Input Sentiment"
-        # ).on_input()
-        #
-        # f_output_sentiment = Feedback(
-        #     provider.sentiment_with_cot_reasons, name="Output Sentiment"
-        # ).on_output()
-
-        f_coherence = Feedback(
-            provider.coherence_with_cot_reasons, name="Coherence"
-        ).on_output()
-
-        virtual_recorder = TruVirtual(
-            app_name="RAG",
-            app_version=name,
-            app=virtual_app,
-            feedbacks=[
-                # f_in_coherence,
-                f_coherence,
-                # f_input_sentiment,
-                # f_output_sentiment,
-            ],
-            # feedbacks=[f_context_relevance, f_groundedness, f_qa_relevance],
-        )
-        virtual_recorder.add_dataframe(df)
-
-    run_dashboard(session, port=8000, force=True)
-
-
-def load_trulens2(data):
-    virtual_app = VirtualApp()
-    context = virtual_app.select_context()
-
-#    f_context_relevance = (
-#      Feedback(
-#        provider.context_relevance_with_cot_reasons, name="Context Relevance"
-#      )
-#      .on_input()
-#      .on(context)
-#    )
-
-    # f_context_relevance = (
-    #   Feedback(
-    #     provider.context_relevance_with_cot_reasons, name="Context Relevance"
-    #   )
-    #   .on_input()
-    #   .on(context)
-    # )
-
-#    Question/statement relevance between question and each context chunk.
-    f_context_relevance1 = (
-        Feedback(
-            provider.context_relevance_with_cot_reasons, name="Context Relevance1"
-        )
-        .on_input()
-        .on(context)
-    )
-    
-
-    f_context_relevance2 = (
-        Feedback(
-            provider.context_relevance_with_cot_reasons, name="Context Relevance2"
-        )
-        .on_input()
-        .on(context)
-    )
-
-    feedbacks = [f_context_relevance1, f_context_relevance2]
-    session = TruSession()
-    session.reset_database()
-
-
-    run_dashboard(session, port=8000, force=True)
-
-
-
-    virtual_recorder1 = TruVirtual(
-      app_name="gptlab",
-      app_version='datasets/gs.json',
-      app=virtual_app,
-      feedbacks=feedbacks
-    )
-    virtual_records1 = virtual_recorder1.add_dataframe(data['datasets/gs.json'])
-    import pdb; pdb.set_trace()
-
-    virtual_recorder2 = TruVirtual(
-      app_name="gptlab",
-      app_version='datasets/gs.json 2',
-      app=virtual_app,
-      feedbacks=feedbacks
-    )
-    virtual_records2 = virtual_recorder2.add_dataframe(data['datasets/gs.json'])
-
-    virtual_recorder3 = TruVirtual(
-      app_name="gptlab",
-      app_version='datasets/gs.json 3',
-      app=virtual_app,
-      feedbacks=feedbacks
-    )
-    virtual_records3 = virtual_recorder3.add_dataframe(data['datasets/gs.json'])
-
-def load_trulens3(in_data):
+def load_trulens(in_data):
     session = TruSession()
     session.reset_database()
 
     from trulens.apps.virtual import VirtualRecord
     from trulens.core import Select
+
     retriever_component = Select.RecordCalls.retriever
 
     context_call = retriever_component.get_context
 
+    for version in in_data.keys():
+        virtual_app = VirtualApp()  # can start with the prior dictionary
+        virtual_app[Select.RecordCalls.llm.maxtokens] = 1024
+        virtual_app.app_id = "RAG"
+        virtual_app.app_name = "RAG"
+        virtual_app.app_version = version
 
-    virtual_app = dict(
-        llm=dict(
-            modelname="some llm component model name"
-        ),
-        template="information about the template I used in my app",
-        debug="all of these fields are completely optional"
-    )
+        # session.add_app(virtual_app)
 
-    virtual_app = VirtualApp(virtual_app) # can start with the prior dictionary
-    virtual_app[Select.RecordCalls.llm.maxtokens] = 1024
+        df = in_data[version]
+        data_dict = df.to_dict("records")
 
-    df = in_data['datasets/gs.json']
-    
-    data_dict = df.to_dict('records')
-
-    data = []
-    import pdb; pdb.set_trace()
-    for record in data_dict:
-        rec = VirtualRecord(
-            main_input=record['query'],
-            main_output=record['response'],
-            calls=
-                {
-                    context_call: dict(
-                        args=[record['query']],
-                        rets=[record['contexts']]
-                    )
-                }
+        records = []
+        for record in data_dict:
+            rec = VirtualRecord(
+                main_input=record["query"],
+                main_output=record["response"],
+                calls={
+                    context_call: {
+                        "args": [record["query"]],
+                        "rets": record["contexts"],
+                    }
+                },
             )
-        data.append(rec)
-    import pdb; pdb.set_trace()
-    context = context_call.rets[:]
-    f_context_relevance = (
-        Feedback(provider.context_relevance)
-        .on_input()
-        .on(context)
-    )
+            records.append(rec)
 
-    virtual_recorder = TruVirtual(
-        app_name="a virtual app",
-        app=virtual_app,
-        feedbacks=[f_context_relevance]
-    )
+        context = context_call.rets[:]
+        f_context_relevance = (
+            Feedback(provider.context_relevance, name="Context Relevance")
+            .on_input()
+            .on(context)
+        )
 
-    for record in data:
-        virtual_recorder.add_record(rec)
+        feedbacks = [f_context_relevance]
+        virtual_recorder = TruVirtual(
+            app_name="RAG",
+            app=virtual_app,
+            app_version=version,
+            feedbacks=feedbacks,
+        )
+
+        # import pdb
+        #
+        # pdb.set_trace()
+        for record in records:
+            feedback_results = session.run_feedback_functions(
+                record, feedbacks, virtual_app
+            )
+            fr = list(feedback_results)
+            # .add_feedbacks(feedback_results)
+            virtual_recorder.add_record(record)
 
     run_dashboard(session, port=8000, force=True)
-
-
-
 
 
 if __name__ == "__main__":
@@ -261,6 +126,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     data = load_dataset(args.input)
-#    load_trulens(data)
-    load_trulens2(data)
-#    load_trulens3(data)
+    load_trulens(data)
