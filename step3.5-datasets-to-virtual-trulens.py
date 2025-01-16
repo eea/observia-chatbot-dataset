@@ -54,6 +54,9 @@ def load_dataset(paths):
 
 
 def load_trulens(data):
+
+
+
     session = TruSession()
     session.reset_database()
 
@@ -115,6 +118,142 @@ def load_trulens(data):
     run_dashboard(session, port=8000, force=True)
 
 
+def load_trulens2(data):
+    virtual_app = VirtualApp()
+    context = virtual_app.select_context()
+
+#    f_context_relevance = (
+#      Feedback(
+#        provider.context_relevance_with_cot_reasons, name="Context Relevance"
+#      )
+#      .on_input()
+#      .on(context)
+#    )
+
+    # f_context_relevance = (
+    #   Feedback(
+    #     provider.context_relevance_with_cot_reasons, name="Context Relevance"
+    #   )
+    #   .on_input()
+    #   .on(context)
+    # )
+
+#    Question/statement relevance between question and each context chunk.
+    f_context_relevance1 = (
+        Feedback(
+            provider.context_relevance_with_cot_reasons, name="Context Relevance1"
+        )
+        .on_input()
+        .on(context)
+    )
+    
+
+    f_context_relevance2 = (
+        Feedback(
+            provider.context_relevance_with_cot_reasons, name="Context Relevance2"
+        )
+        .on_input()
+        .on(context)
+    )
+
+    feedbacks = [f_context_relevance1, f_context_relevance2]
+    session = TruSession()
+    session.reset_database()
+
+
+    run_dashboard(session, port=8000, force=True)
+
+
+
+    virtual_recorder1 = TruVirtual(
+      app_name="gptlab",
+      app_version='datasets/gs.json',
+      app=virtual_app,
+      feedbacks=feedbacks
+    )
+    virtual_records1 = virtual_recorder1.add_dataframe(data['datasets/gs.json'])
+    import pdb; pdb.set_trace()
+
+    virtual_recorder2 = TruVirtual(
+      app_name="gptlab",
+      app_version='datasets/gs.json 2',
+      app=virtual_app,
+      feedbacks=feedbacks
+    )
+    virtual_records2 = virtual_recorder2.add_dataframe(data['datasets/gs.json'])
+
+    virtual_recorder3 = TruVirtual(
+      app_name="gptlab",
+      app_version='datasets/gs.json 3',
+      app=virtual_app,
+      feedbacks=feedbacks
+    )
+    virtual_records3 = virtual_recorder3.add_dataframe(data['datasets/gs.json'])
+
+def load_trulens3(in_data):
+    session = TruSession()
+    session.reset_database()
+
+    from trulens.apps.virtual import VirtualRecord
+    from trulens.core import Select
+    retriever_component = Select.RecordCalls.retriever
+
+    context_call = retriever_component.get_context
+
+
+    virtual_app = dict(
+        llm=dict(
+            modelname="some llm component model name"
+        ),
+        template="information about the template I used in my app",
+        debug="all of these fields are completely optional"
+    )
+
+    virtual_app = VirtualApp(virtual_app) # can start with the prior dictionary
+    virtual_app[Select.RecordCalls.llm.maxtokens] = 1024
+
+    df = in_data['datasets/gs.json']
+    
+    data_dict = df.to_dict('records')
+
+    data = []
+    import pdb; pdb.set_trace()
+    for record in data_dict:
+        rec = VirtualRecord(
+            main_input=record['query'],
+            main_output=record['response'],
+            calls=
+                {
+                    context_call: dict(
+                        args=[record['query']],
+                        rets=[record['contexts']]
+                    )
+                }
+            )
+        data.append(rec)
+    import pdb; pdb.set_trace()
+    context = context_call.rets[:]
+    f_context_relevance = (
+        Feedback(provider.context_relevance)
+        .on_input()
+        .on(context)
+    )
+
+    virtual_recorder = TruVirtual(
+        app_name="a virtual app",
+        app=virtual_app,
+        feedbacks=[f_context_relevance]
+    )
+
+    for record in data:
+        virtual_recorder.add_record(rec)
+
+    run_dashboard(session, port=8000, force=True)
+
+
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load Goldenset dataset in trulens")
     parser.add_argument(
@@ -122,4 +261,6 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     data = load_dataset(args.input)
-    load_trulens(data)
+#    load_trulens(data)
+    load_trulens2(data)
+#    load_trulens3(data)
