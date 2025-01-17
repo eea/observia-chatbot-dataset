@@ -1,13 +1,16 @@
-import random
+from tenacity import retry
+from tenacity import stop_after_attempt
+from tenacity import wait_random_exponential
+from trulens.apps.custom import TruCustomApp
+from trulens.apps.custom import instrument
+from trulens.core import Feedback
+from trulens.core import Select
+from trulens.core import TruSession
+from trulens.dashboard.run import run_dashboard
+from trulens.providers.openai import OpenAI
 import argparse
 import json
 import pandas as pd
-from trulens.providers.openai import OpenAI
-from trulens.core import Feedback
-from trulens.apps.virtual import VirtualApp
-from trulens.core import TruSession
-from trulens.dashboard.run import run_dashboard
-from trulens.apps.virtual import TruVirtual
 
 
 TOGETHERAI_API_KEY = ""
@@ -54,69 +57,53 @@ def load_dataset(paths):
     return out
 
 
+class CustomApp:
+    def __init__(self, records):
+        self.records = {}
+        for rec in records:
+            self.records[rec["query"]] = rec
+
+    @instrument
+    def query(self, question):
+        record = self.records[question]
+        return record["response"]
+
+
 def load_trulens(in_data):
     session = TruSession()
     session.reset_database()
 
-    from trulens.apps.virtual import VirtualRecord
-    from trulens.core import Select
-
-    retriever_component = Select.RecordCalls.retriever
-
-    context_call = retriever_component.get_context
-
     for version in in_data.keys():
-        virtual_app = VirtualApp()  # can start with the prior dictionary
-        virtual_app[Select.RecordCalls.llm.maxtokens] = 1024
-        virtual_app.app_id = "RAG"
-        virtual_app.app_name = "RAG"
-        virtual_app.app_version = version
-
-        # session.add_app(virtual_app)
-
         df = in_data[version]
         data_dict = df.to_dict("records")
 
-        records = []
-        for record in data_dict:
-            rec = VirtualRecord(
-                main_input=record["query"],
-                main_output=record["response"],
-                calls={
-                    context_call: {
-                        "args": [record["query"]],
-                        "rets": record["contexts"],
-                    }
-                },
-                ContextRelevance=random.random(),
-            )
-            records.append(rec)
-
-        context = context_call.rets[:]
+        app = CustomApp(data_dict)
         f_context_relevance = (
-            Feedback(provider.context_relevance, name="ContextRelevance")
-            .on_input()
-            .on(context)
+            Feedback(
+                provider.groundedness_measure_with_cot_reasons,
+                name="Groundedness - LLM Judge",
+            )
+            .on(Select.RecordInput)
+            .on(Select.RecordOutput)
         )
 
         feedbacks = [f_context_relevance]
-        virtual_recorder = TruVirtual(
+
+        tru_recorder = TruCustomApp(
+            app=app,
             app_name="RAG",
-            app=virtual_app,
             app_version=version,
             feedbacks=feedbacks,
         )
 
-        # import pdb
-        #
-        # pdb.set_trace()
-        for record in records:
-            # feedback_results = session.run_feedback_functions(
-            #     record, feedbacks, virtual_app
-            # )
-            # fr = list(feedback_results)
-            # .add_feedbacks(feedback_results)
-            virtual_recorder.add_record(record)
+        @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+        def run_with_backoff(doc):
+            print("running", doc)
+            return tru_recorder.with_record(app.query, question=doc)
+
+        for record in data_dict:
+            llm_response = run_with_backoff(record["query"])
+            print(llm_response)
 
     run_dashboard(session, port=8000, force=True)
 
