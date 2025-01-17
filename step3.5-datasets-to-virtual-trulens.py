@@ -69,9 +69,10 @@ class CustomApp:
         return record["response"]
 
 
-def custom_feedback(question, context):
-    print(f"Feedback for {question}")
-    return 1.0 / (1.0 + len(question) * len(question)) * 100
+def custom_feedback(question, response):
+    print(f"Custom Feedback for {question}")
+    print(f"Custom Response for {response}")
+    return (1.0 / (1.0 + len(question) * len(question)) * 100, {"reasons": "de-aia"})
 
 
 def load_trulens(in_data):
@@ -103,11 +104,7 @@ def load_trulens(in_data):
                         rets=rec["contexts"],
                     ),
                     generation: dict(
-                        args=[
-                            """
-                    to be filled in
-                      """
-                        ],
+                        args=[""" to be filled in """],
                         rets=rec["response"],
                     ),
                 },
@@ -115,19 +112,17 @@ def load_trulens(in_data):
             for rec in data_dict
         ]
 
-        f_context_relevance = (
-            Feedback(
-                provider.coherence_with_cot_reasons,
-                name="Coherence COT",
-            ).on_output()
-            # .on_input()
-            # .on(context)
-            # .on(Select.RecordInput)
-            # .on(Select.RecordOutput)
-        )
-        f_custom = Feedback(custom_feedback).on_input_output()
+        f_context_relevance = Feedback(
+            provider.coherence_with_cot_reasons,
+            name="Coherence COT",
+        ).on_output()
+        f_custom = Feedback(custom_feedback, name="Custom feedback").on_input_output()
 
-        feedbacks = [f_context_relevance, f_custom]
+        feedbacks = [
+            # f_context_relevance,
+            #
+            f_custom
+        ]
         virtual_app = VirtualApp()
 
         tru_recorder = TruVirtual(
@@ -141,14 +136,10 @@ def load_trulens(in_data):
         for record in records:
             tru_recorder.add_record(record)
 
-        # @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
-        # def run_with_backoff(doc):
-        #     print("running", doc)
-        #     return tru_recorder.with_record(app.query, question=doc)
-
-        # for record in data_dict:
-        #     llm_response = run_with_backoff(record["query"])
-        #     print(llm_response)
+            # .on_input()
+            # .on(context)
+            # .on(Select.RecordInput)
+            # .on(Select.RecordOutput)
 
     session.start_evaluator()
     run_dashboard(session, port=8000, force=True)
