@@ -113,7 +113,10 @@ def load_trulens(in_data):
             Feedback(
                 provider.groundedness_measure_with_cot_reasons,
                 name="Groundedness - LLM Judge",
-            ).on_input_output()
+            )
+            .on_input()
+            .on(context)
+            # .on_input_output()
             # .on(Select.RecordInput)
             # .on(Select.RecordOutput)
         )
