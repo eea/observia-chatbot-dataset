@@ -1,3 +1,4 @@
+import random
 import argparse
 import json
 import pandas as pd
@@ -87,12 +88,13 @@ def load_trulens(in_data):
                         "rets": record["contexts"],
                     }
                 },
+                ContextRelevance=random.random(),
             )
             records.append(rec)
 
         context = context_call.rets[:]
         f_context_relevance = (
-            Feedback(provider.context_relevance, name="Context Relevance")
+            Feedback(provider.context_relevance, name="ContextRelevance")
             .on_input()
             .on(context)
         )
@@ -109,10 +111,10 @@ def load_trulens(in_data):
         #
         # pdb.set_trace()
         for record in records:
-            feedback_results = session.run_feedback_functions(
-                record, feedbacks, virtual_app
-            )
-            fr = list(feedback_results)
+            # feedback_results = session.run_feedback_functions(
+            #     record, feedbacks, virtual_app
+            # )
+            # fr = list(feedback_results)
             # .add_feedbacks(feedback_results)
             virtual_recorder.add_record(record)
 
