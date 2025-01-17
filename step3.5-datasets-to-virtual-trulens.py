@@ -87,8 +87,6 @@ def load_trulens(in_data):
     session.reset_database()
 
     retriever = Select.RecordCalls.retriever
-    # context_call = retriever.get_context
-    # context = context_call.rets[:]
 
     synthesizer = Select.RecordCalls.synthesizer
     generation = synthesizer.generate
@@ -114,11 +112,17 @@ def load_trulens(in_data):
             for rec in data_dict
         ]
 
-        f_context_relevance = Feedback(
+        f_coherence = Feedback(
             provider.coherence_with_cot_reasons,
             name="Coherence COT",
         ).on_output()
 
+        f_relevance = Feedback(
+            provider.relevance_with_cot_reasons,
+            name="Relevance COT",
+        ).on_input_output()
+
+        # See https://www.trulens.org/component_guides/evaluation/feedback_selectors/selecting_components/
         f_custom = (
             Feedback(custom_feedback, name="Custom feedback")
             .on_input_output()
@@ -128,11 +132,7 @@ def load_trulens(in_data):
             .on(Select.RecordCalls.retriever.rets)
         )
 
-        feedbacks = [
-            # f_context_relevance,
-            #
-            f_custom
-        ]
+        feedbacks = [f_coherence, f_relevance, f_custom]
         virtual_app = VirtualApp()
 
         tru_recorder = TruVirtual(
@@ -143,8 +143,10 @@ def load_trulens(in_data):
             # feedback_mode="deferred",  # optional
         )
 
-        for record in records:
+        for i, record in enumerate(records):
             tru_recorder.add_record(record)
+            if i > 10:
+                break
 
             # .on_input()
             # .on(context)
