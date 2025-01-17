@@ -69,10 +69,13 @@ class CustomApp:
         return record["response"]
 
 
-def custom_feedback(question, response):
-    print(f"Custom Feedback for {question}")
-    print(f"Custom Response for {response}")
-    return (1.0 / (1.0 + len(question) * len(question)) * 100, {"reasons": "de-aia"})
+def custom_feedback(query, response, contexts):
+    # print(f"\n---=Query: {query}\n")
+    # print(f"\n---=Response: {response}\n")
+    # print(f"\n---=Contezts: {contexts}\n")
+    # print(f"Custom Feedback for {question}")
+    # print(f"Custom Response for {response}")
+    return (1.0 / (1.0 + len(query) * len(query)) * 100, {"reasons": "de-aia"})
 
 
 def load_trulens(in_data):
@@ -84,12 +87,11 @@ def load_trulens(in_data):
     session.reset_database()
 
     retriever = Select.RecordCalls.retriever
-    context_call = retriever.get_context
+    # context_call = retriever.get_context
+    # context = context_call.rets[:]
 
     synthesizer = Select.RecordCalls.synthesizer
     generation = synthesizer.generate
-
-    # context = context_call.rets[:]
 
     for version in in_data.keys():
         df = in_data[version]
@@ -99,7 +101,7 @@ def load_trulens(in_data):
                 main_input=rec["query"],
                 main_output=rec["response"],
                 calls={
-                    context_call: dict(
+                    retriever: dict(
                         args=[rec["query"]],
                         rets=rec["contexts"],
                     ),
@@ -116,7 +118,15 @@ def load_trulens(in_data):
             provider.coherence_with_cot_reasons,
             name="Coherence COT",
         ).on_output()
-        f_custom = Feedback(custom_feedback, name="Custom feedback").on_input_output()
+
+        f_custom = (
+            Feedback(custom_feedback, name="Custom feedback")
+            .on_input_output()
+            # .on(
+            #     Select.RecordCalls.retriever.args.query
+            # )
+            .on(Select.RecordCalls.retriever.rets)
+        )
 
         feedbacks = [
             # f_context_relevance,
