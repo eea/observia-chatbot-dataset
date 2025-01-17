@@ -70,41 +70,78 @@ class CustomApp:
 
 
 def load_trulens(in_data):
+    from trulens.apps.virtual import VirtualRecord
+    from trulens.apps.virtual import TruVirtual
+    from trulens.apps.virtual import VirtualApp
+
     session = TruSession()
     session.reset_database()
+
+    retriever = Select.RecordCalls.retriever
+    synthesizer = Select.RecordCalls.synthesizer
+
+    context_call = retriever.get_context
+    generation = synthesizer.generate
+    context = context_call.rets[:]
 
     for version in in_data.keys():
         df = in_data[version]
         data_dict = df.to_dict("records")
+        records = [
+            VirtualRecord(
+                main_input=rec["query"],
+                main_output=rec["response"],
+                calls={
+                    context_call: dict(
+                        args=[rec["query"]],
+                        rets=rec["contexts"],
+                    ),
+                    generation: dict(
+                        args=[
+                            """
+                    to be filled in
+                      """
+                        ],
+                        rets=rec["response"],
+                    ),
+                },
+            )
+            for rec in data_dict
+        ]
 
-        app = CustomApp(data_dict)
         f_context_relevance = (
             Feedback(
                 provider.groundedness_measure_with_cot_reasons,
                 name="Groundedness - LLM Judge",
-            )
-            .on(Select.RecordInput)
-            .on(Select.RecordOutput)
+            ).on_input_output()
+            # .on(Select.RecordInput)
+            # .on(Select.RecordOutput)
         )
 
         feedbacks = [f_context_relevance]
+        virtual_app = VirtualApp()
 
-        tru_recorder = TruCustomApp(
-            app=app,
+        tru_recorder = TruVirtual(
+            app=virtual_app,
             app_name="RAG",
             app_version=version,
             feedbacks=feedbacks,
+            # feedback_mode="deferred",  # optional
         )
 
-        @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
-        def run_with_backoff(doc):
-            print("running", doc)
-            return tru_recorder.with_record(app.query, question=doc)
+        for record in records:
+            tru_recorder.add_record(record)
 
-        for record in data_dict:
-            llm_response = run_with_backoff(record["query"])
-            print(llm_response)
+        # @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
+        # def run_with_backoff(doc):
+        #     print("running", doc)
+        #     return tru_recorder.with_record(app.query, question=doc)
 
+        # for record in data_dict:
+        #     llm_response = run_with_backoff(record["query"])
+        #     print(llm_response)
+
+    session.start_evaluator()
     run_dashboard(session, port=8000, force=True)
 
 
