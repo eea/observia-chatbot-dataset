@@ -69,6 +69,11 @@ class CustomApp:
         return record["response"]
 
 
+def custom_feedback(question, context):
+    print(f"Feedback for {question}")
+    return 1.0 / (1.0 + len(question) * len(question)) * 100
+
+
 def load_trulens(in_data):
     from trulens.apps.virtual import VirtualRecord
     from trulens.apps.virtual import TruVirtual
@@ -78,11 +83,12 @@ def load_trulens(in_data):
     session.reset_database()
 
     retriever = Select.RecordCalls.retriever
-    synthesizer = Select.RecordCalls.synthesizer
-
     context_call = retriever.get_context
+
+    synthesizer = Select.RecordCalls.synthesizer
     generation = synthesizer.generate
-    context = context_call.rets[:]
+
+    # context = context_call.rets[:]
 
     for version in in_data.keys():
         df = in_data[version]
@@ -111,17 +117,17 @@ def load_trulens(in_data):
 
         f_context_relevance = (
             Feedback(
-                provider.groundedness_measure_with_cot_reasons,
-                name="Groundedness - LLM Judge",
-            )
-            .on_input()
-            .on(context)
-            # .on_input_output()
+                provider.coherence_with_cot_reasons,
+                name="Coherence COT",
+            ).on_output()
+            # .on_input()
+            # .on(context)
             # .on(Select.RecordInput)
             # .on(Select.RecordOutput)
         )
+        f_custom = Feedback(custom_feedback).on_input_output()
 
-        feedbacks = [f_context_relevance]
+        feedbacks = [f_context_relevance, f_custom]
         virtual_app = VirtualApp()
 
         tru_recorder = TruVirtual(
