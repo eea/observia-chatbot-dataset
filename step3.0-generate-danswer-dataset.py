@@ -12,6 +12,10 @@ from langchain_together.chat_models import ChatTogether
 from langchain.schema import HumanMessage
 from collections import namedtuple
 
+from vespa.application import Vespa
+
+url = "http://10.50.5.60:64797/"
+app = Vespa(url=url)
 
 logger = logging.getLogger("qa")
 logger.setLevel(logging.INFO)  # Set the default logging level for the logger
@@ -137,18 +141,21 @@ def get_answer(question, persona_id):
     return rec
 
 
-# def summarize(text):
-#     prompt = f"""Summarize the following text. Retain all important aspects, but make the text shorter.
-#
-# {text}
-# """
-#     llm = ChatTogether(
-#         model_name=conf.llm_chat_model,
-#         api_key=conf.llm_chat_key,
-#         streaming=False,  # Disable streaming to get a simple text response
-#     )
-#     response = llm([HumanMessage(content=prompt)])
-#     return response.content
+def download_document(session, document_id, chunk_id):
+    # TODO: identify if chunk number is 400, to allow pagination.
+    query = f"""
+        select *
+        from sources *
+        where document_id in ("{document_id}") and chunk_id in ({chunk_id})
+        order by chunk_id
+        limit 400
+    """
+    response = session.query(yql=query)
+    assert response.is_successful()
+    data = response.get_json()
+
+    for chunk in data["root"].get("children", []):
+        yield chunk
 
 
 def make_record(question):
@@ -164,8 +171,18 @@ def make_record(question):
     logger.info("Answer: \n%s", answer)
 
     logger.info("Extracting ground truths from %s documents", len(msg["context"]))
+
     for doc in msg["context"]:
-        context = doc["blurb"]
+        with app.syncio() as session:
+            document_id = doc["document_id"]
+            chunk_id = doc["chunk_ind"]
+            logger.info(f"Fetching {document_id} / {chunk_id} from Vespa")
+            docs = list(download_document(session, document_id, chunk_id))
+            if docs:
+                context = docs[0]["fields"]["content"]
+            else:
+                context = doc["blurb"]
+
         gt = extract_ground_truth(question, answer, context)
         if gt.strip().lower() in ["no", "not related.", "not related"]:
             logger.debug("No ground truth in context: \n%s", context)

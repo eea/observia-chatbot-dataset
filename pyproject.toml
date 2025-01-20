@@ -13,6 +13,7 @@ trulens-providers-openai = "^1.3.0"
 bertopic = {extras = ["flair", "use"], version = "^0.16.4"}
 langid = "^1.1.6"
 langchain-together = "^0.3.0"
+pyvespa = "^0.52.0"
 
 
 [build-system]
