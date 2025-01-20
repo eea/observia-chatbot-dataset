@@ -13,13 +13,13 @@ python step1-download-vespa-database.py
 ## Step 2: generate topic-based questions
 
 ```bash
-python step2-topic-generation.py data-download/GS_CEMS/ datasets/GS_CEMS-topics.json 200
+python step2.0-topic-generation.py data-download/GS_CEMS/ datasets/GS_CEMS-topics.json 200
 ```
 
 ## Step 2.1: filter only English questions (optional)
 
 ```bash
-python step1.1-filter-for-english.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-topics-en.json
+python step2.1-filter-for-english.py datasets/GS_CEMS-topics.json datasets/GS_CEMS-topics-en.json
 ```
 
 ## Step 2.2: extract the questions to a new text file
@@ -31,7 +31,7 @@ python step2.1-extract-primary-questions.py datasets/GS_CEMS-topics-en.json data
 ## Step 3: generate GoldenSet dataset
 
 ```bash
-python step3-generate-danswer-dataset.py datasets/GS_CEMS-questions.txt datasets/GS_CEMS-goldenset.json
+python step3.0-generate-danswer-dataset.py datasets/GS_CEMS-questions.txt datasets/GS_CEMS-goldenset.json
 ```
 
 ## Step 3.5: load multiple goldenset-style datasets in local Trulens
@@ -43,5 +43,5 @@ python step3.5-dataset-to-virtual-trulens.py dataset.json datasets/GS_CEMS-golde
 ## Step 4: convert GoldenSet to Excel
 
 ```bash
-python step4-dataset2xls.py datasets/GS_CEMS-goldenset.json datasets/GS_CEMS-goldenset.xls
+python step4.0-dataset2xls.py datasets/GS_CEMS-goldenset.json datasets/GS_CEMS-goldenset.xls
 ```
