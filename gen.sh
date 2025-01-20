@@ -26,7 +26,7 @@ echo "Dataset generating from: $FOLDER_NAME"
 mkdir -p "$OUT_PATH"
 
 echo "Making topic-based questions json file to ${QUESTIONS_JSON_FILE}"
-#poetry run python step2.0-topic-generation.py "$FULL_PATH" "$QUESTIONS_JSON_FILE" 200
+poetry run python step2.0-topic-generation.py "$FULL_PATH" "$QUESTIONS_JSON_FILE" 200
 
 echo "Filtering non-English questions, output in ${QUESTIONS_JSON_EN_FILE}"
 $PYTHON step2.1-filter-for-english.py "${QUESTIONS_JSON_FILE}" "${QUESTIONS_JSON_EN_FILE}"
