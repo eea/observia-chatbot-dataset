@@ -18,15 +18,13 @@ QUESTIONS_JSON_FILE="${OUT_PATH}/${FOLDER_NAME}.json"
 QUESTIONS_JSON_EN_FILE="${OUT_PATH}/${FOLDER_NAME}-en.json"
 QUESTIONS_TXT_FILE="${OUT_PATH}/${FOLDER_NAME}.txt"
 GS_JSON_FILE="${OUT_PATH}/${FOLDER_NAME}-goldenset.json"
-OUT_CSV_FILE="${OUT_PATH}/${FOLDER_NAME}-goldenset.csv"
+OUT_XLS_FILE="${OUT_PATH}/${FOLDER_NAME}-goldenset.xls"
 
-# Print the folder name (optional, for debugging)
-echo "Dataset generating from: $FOLDER_NAME"
-
+echo "Dataset generating from: $FOLDER_NAME to ${OUT_PATH}"
 mkdir -p "$OUT_PATH"
 
 echo "Making topic-based questions json file to ${QUESTIONS_JSON_FILE}"
-poetry run python step2.0-topic-generation.py "$FULL_PATH" "$QUESTIONS_JSON_FILE" 200
+$PYTHON step2.0-topic-generation.py "$FULL_PATH" "$QUESTIONS_JSON_FILE" 200
 
 echo "Filtering non-English questions, output in ${QUESTIONS_JSON_EN_FILE}"
 $PYTHON step2.1-filter-for-english.py "${QUESTIONS_JSON_FILE}" "${QUESTIONS_JSON_EN_FILE}"
@@ -35,9 +33,7 @@ echo "Writing questions text file to ${QUESTIONS_TXT_FILE}"
 $PYTHON step2.2-extract-primary-questions.py "$QUESTIONS_JSON_EN_FILE" "$QUESTIONS_TXT_FILE"
 
 echo "Making danswer-based dataset, saved to ${GS_JSON_FILE}"
-
 $PYTHON step3.0-generate-danswer-dataset.py "$QUESTIONS_TXT_FILE" "$GS_JSON_FILE"
 
-echo "Converting ${GS_JSON_FILE} to ${OUT_CSV_FILE}"
-
-$PYTHON step4.dataset2xls.py "$GS_JSON_FILE" "$OUT_CSV_FILE"
+echo "Converting ${GS_JSON_FILE} to ${OUT_XLS_FILE}"
+$PYTHON step4.0-dataset2xls.py "$GS_JSON_FILE" "$OUT_XLS_FILE"
