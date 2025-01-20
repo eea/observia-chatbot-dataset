@@ -10,6 +10,7 @@ package-mode = false
 python = "^3.11"
 trulens = "^1.3.0"
 trulens-providers-openai = "^1.3.0"
+bertopic = {extras = ["flair", "use"], version = "^0.16.4"}
 
 
 [build-system]

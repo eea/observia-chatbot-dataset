@@ -1,5 +1,12 @@
 # Golden Dataset generation process
 
+## Step 0: install the package
+
+```
+poetry install --no-root
+poetry shell
+```
+
 ## Step 1: download the Vespa database
 
 This works by connecting to the Postgresql database, getting a list of all document ids, then downloading all chunks for that document id.

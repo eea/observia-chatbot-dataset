@@ -35,7 +35,7 @@ def extract_primary_questions(input_path: str, output_path: str) -> None:
         print(f"Error: '{input_path}' contains invalid JSON")
         sys.exit(1)
     except KeyError as e:
-        print(f"Error: JSON object missing required 'primary_question' field")
+        print("Error: JSON object missing required 'primary_question' field")
         sys.exit(1)
 
 
