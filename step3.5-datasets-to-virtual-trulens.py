@@ -1,12 +1,16 @@
+from tenacity import retry
+from tenacity import stop_after_attempt
+from tenacity import wait_random_exponential
+from trulens.apps.custom import TruCustomApp
+from trulens.apps.custom import instrument
+from trulens.core import Feedback
+from trulens.core import Select
+from trulens.core import TruSession
+from trulens.dashboard.run import run_dashboard
+from trulens.providers.openai import OpenAI
 import argparse
 import json
 import pandas as pd
-from trulens.providers.openai import OpenAI
-from trulens.core import Feedback
-from trulens.apps.virtual import VirtualApp
-from trulens.core import TruSession
-from trulens.dashboard.run import run_dashboard
-from trulens.apps.virtual import TruVirtual
 
 
 TOGETHERAI_API_KEY = ""
@@ -53,65 +57,103 @@ def load_dataset(paths):
     return out
 
 
-def load_trulens(data):
+class CustomApp:
+    def __init__(self, records):
+        self.records = {}
+        for rec in records:
+            self.records[rec["query"]] = rec
+
+    @instrument
+    def query(self, question):
+        record = self.records[question]
+        return record["response"]
+
+
+def custom_feedback(query, response, contexts):
+    # print(f"\n---=Query: {query}\n")
+    # print(f"\n---=Response: {response}\n")
+    # print(f"\n---=Contezts: {contexts}\n")
+    # print(f"Custom Feedback for {question}")
+    # print(f"Custom Response for {response}")
+    return (1.0 / (1.0 + len(query) * len(query)) * 100, {"reasons": "de-aia"})
+
+
+def load_trulens(in_data):
+    from trulens.apps.virtual import VirtualRecord
+    from trulens.apps.virtual import TruVirtual
+    from trulens.apps.virtual import VirtualApp
+
     session = TruSession()
     session.reset_database()
 
-    for name, df in data.items():
-        virtual_app = VirtualApp()
-        context = VirtualApp.select_context()
-        # Question/statement relevance between question and each context chunk.
-        # f_context_relevance = (
-        #     Feedback(
-        #         provider.context_relevance_with_cot_reasons, name="Context Relevance"
-        #     )
-        #     .on_input()
-        #     .on(context)
-        # )
-        #
-        # # Define a groundedness feedback function
-        # f_groundedness = (
-        #     Feedback(
-        #         provider.groundedness_measure_with_cot_reasons, name="Groundedness"
-        #     )
-        #     .on(context.collect())
-        #     .on_output()
-        # )
-        #
-        # # Question/answer relevance between overall question and answer.
-        # f_qa_relevance = Feedback(
-        #     provider.relevance_with_cot_reasons, name="Answer Relevance"
-        # ).on_input_output()
-        # f_in_coherence = Feedback(
-        #     provider.coherence_with_cot_reasons, name="Input Coherence"
-        # ).on_input()
+    retriever = Select.RecordCalls.retriever
 
-        # f_input_sentiment = Feedback(
-        #     provider.sentiment_with_cot_reasons, name="Input Sentiment"
-        # ).on_input()
-        #
-        # f_output_sentiment = Feedback(
-        #     provider.sentiment_with_cot_reasons, name="Output Sentiment"
-        # ).on_output()
+    synthesizer = Select.RecordCalls.synthesizer
+    generation = synthesizer.generate
+
+    for version in in_data.keys():
+        df = in_data[version]
+        data_dict = df.to_dict("records")
+        records = [
+            VirtualRecord(
+                main_input=rec["query"],
+                main_output=rec["response"],
+                calls={
+                    retriever: dict(
+                        args=[rec["query"]],
+                        rets=rec["contexts"],
+                    ),
+                    generation: dict(
+                        args=[""" to be filled in """],
+                        rets=rec["response"],
+                    ),
+                },
+            )
+            for rec in data_dict
+        ]
 
         f_coherence = Feedback(
-            provider.coherence_with_cot_reasons, name="Coherence"
+            provider.coherence_with_cot_reasons,
+            name="Coherence COT",
         ).on_output()
 
-        virtual_recorder = TruVirtual(
-            app_name="RAG",
-            app_version=name,
-            app=virtual_app,
-            feedbacks=[
-                # f_in_coherence,
-                f_coherence,
-                # f_input_sentiment,
-                # f_output_sentiment,
-            ],
-            # feedbacks=[f_context_relevance, f_groundedness, f_qa_relevance],
-        )
-        virtual_recorder.add_dataframe(df)
+        f_relevance = Feedback(
+            provider.relevance_with_cot_reasons,
+            name="Relevance COT",
+        ).on_input_output()
 
+        # See https://www.trulens.org/component_guides/evaluation/feedback_selectors/selecting_components/
+        f_custom = (
+            Feedback(custom_feedback, name="Custom feedback")
+            .on_input_output()
+            # .on(
+            #     Select.RecordCalls.retriever.args.query
+            # )
+            .on(Select.RecordCalls.retriever.rets)
+        )
+
+        feedbacks = [f_coherence, f_relevance, f_custom]
+        virtual_app = VirtualApp()
+
+        tru_recorder = TruVirtual(
+            app=virtual_app,
+            app_name="RAG",
+            app_version=version,
+            feedbacks=feedbacks,
+            # feedback_mode="deferred",  # optional
+        )
+
+        for i, record in enumerate(records):
+            tru_recorder.add_record(record)
+            if i > 10:
+                break
+
+            # .on_input()
+            # .on(context)
+            # .on(Select.RecordInput)
+            # .on(Select.RecordOutput)
+
+    session.start_evaluator()
     run_dashboard(session, port=8000, force=True)
 
 

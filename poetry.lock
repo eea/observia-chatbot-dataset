@@ -4989,13 +4989,13 @@ files = [
 
 [[package]]
 name = "trulens"
-version = "1.3.0"
+version = "1.3.2"
 description = "Library to systematically track and evaluate LLM based applications."
 optional = false
 python-versions = "!=2.7.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,>=3.8"
 files = [
-    {file = "trulens-1.3.0-py3-none-any.whl", hash = "sha256:c0a085547313925694cb9d71f65fa4a86bd1388f34fd2435ff40cecda0db0399"},
-    {file = "trulens-1.3.0.tar.gz", hash = "sha256:a48a61c8150405c2226ddb25edc9626af7efe547e78c3927a51ff2cb79dd1fae"},
+    {file = "trulens-1.3.2-py3-none-any.whl", hash = "sha256:9b27daeafd31e19cc209a99617194555b5d6d7986de4329f5f53367be44ccc9c"},
+    {file = "trulens-1.3.2.tar.gz", hash = "sha256:343e38b0f6846ea5a650dc49ef107d824f89039cd279821d62a3663337c0cd47"},
 ]
 
 [package.dependencies]
@@ -5008,13 +5008,13 @@ trulens-otel-semconv = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "trulens-core"
-version = "1.3.0"
+version = "1.3.2"
 description = "Library to systematically track and evaluate LLM based applications."
 optional = false
 python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "trulens_core-1.3.0-py3-none-any.whl", hash = "sha256:c8b07f4c83826efa45bf61469c0277fb95bea3e25e020f004c10199f471d1a49"},
-    {file = "trulens_core-1.3.0.tar.gz", hash = "sha256:93bcb4dc57ed8722a0c140229fe3fdde521deeea68ce5d9af3314778ee085398"},
+    {file = "trulens_core-1.3.2-py3-none-any.whl", hash = "sha256:e371b3a87b09a8495491a096dc2e6072e191cd2914dd0c7113d4672b4d1cb172"},
+    {file = "trulens_core-1.3.2.tar.gz", hash = "sha256:b4baf2a126be88b59f7145027f9b52ffd9cf45e10606e88aed5397c9783fb186"},
 ]
 
 [package.dependencies]
@@ -5039,13 +5039,13 @@ typing_extensions = ">=4.9,<5.0"
 
 [[package]]
 name = "trulens-dashboard"
-version = "1.3.0"
+version = "1.3.2"
 description = "Library to systematically track and evaluate LLM based applications."
 optional = false
 python-versions = "!=2.7.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,>=3.8"
 files = [
-    {file = "trulens_dashboard-1.3.0-py3-none-any.whl", hash = "sha256:0285503b665f883e74c5f04ac2c6aab3e85e321f73d8f81ed28eb59f3ecd77ef"},
-    {file = "trulens_dashboard-1.3.0.tar.gz", hash = "sha256:cf26f3019e1a11878579f94a0391e118423aab9658b4fbe68e31a2d11b179174"},
+    {file = "trulens_dashboard-1.3.2-py3-none-any.whl", hash = "sha256:08676d06b2d62e4e42a4c92d5784416169eee24315498c8a57f6063c3d994bed"},
+    {file = "trulens_dashboard-1.3.2.tar.gz", hash = "sha256:c6b855d36f616a4e57d29bf37ab6891bf5fdadd9fb599f7ea038a4754e8422c9"},
 ]
 
 [package.dependencies]
@@ -5067,13 +5067,13 @@ full = ["streamlit-aggrid (>=1.0.5,<2.0.0)"]
 
 [[package]]
 name = "trulens-eval"
-version = "1.3.0"
+version = "1.3.2"
 description = "Backwards-compatibility package for API of trulens_eval<1.0.0 using API of trulens-*>=1.0.0."
 optional = false
 python-versions = "!=2.7.*,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,!=3.7.*,>=3.8"
 files = [
-    {file = "trulens_eval-1.3.0-py3-none-any.whl", hash = "sha256:c5b0a049528f77080e55ee8c113c932872a6f43fe179edb89b9d58c2d74ea7f8"},
-    {file = "trulens_eval-1.3.0.tar.gz", hash = "sha256:03b6f86ec20038af7d72235fe47e6d5df746e7cde327171145ae1cd3efa02eb9"},
+    {file = "trulens_eval-1.3.2-py3-none-any.whl", hash = "sha256:0ae600e76603f133e3c4c64c8c1a8d1f8bf73bf0620ee1760855584eacea078a"},
+    {file = "trulens_eval-1.3.2.tar.gz", hash = "sha256:7dfaf3b1259bf69a07d1f254c37ee21d0034710dd7c3f48decb24217224e8537"},
 ]
 
 [package.dependencies]
@@ -5084,13 +5084,13 @@ trulens-feedback = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "trulens-feedback"
-version = "1.3.0"
+version = "1.3.2"
 description = "A TruLens extension package implementing feedback functions for LLM App evaluation."
 optional = false
 python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "trulens_feedback-1.3.0-py3-none-any.whl", hash = "sha256:d9b2577b062d5d5cb3d5529c5db8a7be9ebea38492717500f721ae158fab3504"},
-    {file = "trulens_feedback-1.3.0.tar.gz", hash = "sha256:bb04d743ded2b9f8df1e5b0ed3eb7af80f82f819ceab2964b9a75a5072d46778"},
+    {file = "trulens_feedback-1.3.2-py3-none-any.whl", hash = "sha256:aa09649b6d8b06ed26e70ea0bcf0b976fbb51b2b17a4c78cd2f5441bc732c0aa"},
+    {file = "trulens_feedback-1.3.2.tar.gz", hash = "sha256:803a7157f38420a6c9d8ced39c1b57e4fffc5e8bd4f169addda7eb2e8018af5b"},
 ]
 
 [package.dependencies]
@@ -5120,13 +5120,13 @@ poetry-core = "<2.0.0"
 
 [[package]]
 name = "trulens-providers-openai"
-version = "1.3.0"
+version = "1.3.2"
 description = "Library to systematically track and evaluate LLM based applications."
 optional = false
 python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "trulens_providers_openai-1.3.0-py3-none-any.whl", hash = "sha256:342524b3358d0f441bb30b9b91d2095cdfd512b87c4aac551b8ff6c9d876a3c5"},
-    {file = "trulens_providers_openai-1.3.0.tar.gz", hash = "sha256:473623577f5a5b5ff380bfa6aa8b557695b1018b594e0d7a0c34d4adceada27d"},
+    {file = "trulens_providers_openai-1.3.2-py3-none-any.whl", hash = "sha256:fd7dfd0c1127d086ddf810390df5590bd0b80ab388049de591625537691a9b2a"},
+    {file = "trulens_providers_openai-1.3.2.tar.gz", hash = "sha256:15351a4c1868747424fc9aea123624261ee1139072e0c263c79094e048ea510a"},
 ]
 
 [package.dependencies]
