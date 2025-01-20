@@ -16,6 +16,7 @@ QUESTIONS_JSON_FILE="${OUT_PATH}/${FOLDER_NAME}.json"
 QUESTIONS_JSON_EN_FILE="${OUT_PATH}/${FOLDER_NAME}-en.json"
 QUESTIONS_TXT_FILE="${OUT_PATH}/${FOLDER_NAME}.txt"
 GS_JSON_FILE="${OUT_PATH}/${FOLDER_NAME}-goldenset.json"
+OUT_CSV_FILE="${OUT_PATH}/${FOLDER_NAME}-goldenset.csv"
 
 # Print the folder name (optional, for debugging)
 echo "Dataset generating from: $FOLDER_NAME"
@@ -31,6 +32,10 @@ poetry run python step2.1-filter-for-english.py "${QUESTIONS_JSON_FILE}" "${QUES
 echo "Writing questions text file to ${QUESTIONS_TXT_FILE}"
 poetry run python step2.2-extract-primary-questions.py "$QUESTIONS_JSON_EN_FILE" "$QUESTIONS_TXT_FILE"
 
-echo "Making danswer-based dataset"
+echo "Making danswer-based dataset, saved to ${GS_JSON_FILE}"
 
 poetry run python step3.0-generate-danswer-dataset.py "$QUESTIONS_TXT_FILE" "$GS_JSON_FILE"
+
+echo "Converting ${GS_JSON_FILE} to ${OUT_CSV_FILE}"
+
+poetry run python step4.dataset2xls.py "$GS_JSON_FILE" "$OUT_CSV_FILE"
