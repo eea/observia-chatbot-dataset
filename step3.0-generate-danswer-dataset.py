@@ -170,9 +170,17 @@ def make_record(question):
     record["answer"] = answer
     logger.info("Answer: \n%s", answer)
 
-    logger.info("Extracting ground truths from %s documents", len(msg["context"]))
+    contexts = []
+    if msg["citations"]:
+        contexts = msg["citations"].values()
+    else:
+        contexts = msg["context"]
 
-    for doc in msg["context"]:
+    record["urls"] = []
+
+    logger.info("Extracting ground truths from %s documents", len(contexts))
+
+    for doc in contexts:
         with app.syncio() as session:
             document_id = doc["document_id"]
             chunk_id = doc["chunk_ind"]
@@ -193,9 +201,10 @@ def make_record(question):
             record["ground_truths"].append(gt)
             if context not in record["contexts"]:
                 record["contexts"].append(context)
+                record["urls"].append(doc["document_id"])
 
-            # only accept one ground truth. TODO: use citations
-            break
+            # TODO: only accept one ground truth?
+            # break
 
     return record
 

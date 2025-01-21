@@ -10,11 +10,12 @@ def json_to_excel(json_file, excel_file):
     rows = []
     for i, question in enumerate(data["question"]):
         gts = "\n".join(data["ground_truths"][i])
+        urls = "\n".join(data["urls"][i])
         answer = data["answer"][i]
 
-        rows.append([question, answer, gts])
+        rows.append([question, answer, gts, urls])
 
-    df = pd.DataFrame(rows, columns=["Question", "Answer", "Ground Truth"])
+    df = pd.DataFrame(rows, columns=["Question", "Answer", "Ground Truth", "URLs"])
 
     df.to_excel(excel_file, index=False, engine="openpyxl")
 
