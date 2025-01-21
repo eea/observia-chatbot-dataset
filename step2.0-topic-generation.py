@@ -95,12 +95,12 @@ def make_topics(documents, n_clusters):
             cluster_selection_method="eom",
             prediction_data=True,
         )
-    cluster_model = HDBSCAN(
-        min_cluster_size=2,
-        metric="euclidean",
-        cluster_selection_method="eom",
-        prediction_data=True,
-    )
+    # cluster_model = HDBSCAN(
+    #     min_cluster_size=2,
+    #     metric="euclidean",
+    #     cluster_selection_method="eom",
+    #     prediction_data=True,
+    # )
 
     representation_model = KeyBERTInspired()
     topic_model = BERTopic(
