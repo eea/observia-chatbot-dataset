@@ -13,6 +13,9 @@ QUESTIONS_TXT_FILE := $(OUT_PATH)/$(FOLDER_NAME).txt
 GS_JSON_FILE := $(OUT_PATH)/$(FOLDER_NAME)-goldenset.json
 OUT_XLS_FILE := $(OUT_PATH)/$(FOLDER_NAME)-goldenset.xls
 
+FILE_COUNT := $(shell find "$(FULL_PATH)" -type f | wc -l)
+TOPIC_COUNT := $(shell echo $$(( $$(( $(FILE_COUNT) / 10 )) > 200 ? 200 : $$(( $(FILE_COUNT) / 10 )) )))
+
 # Check arguments
 ifneq ($(strip $(dir)),)
 ifneq ($(strip $(out_dir)),)
@@ -33,7 +36,7 @@ prepare_dir:
 
 generate_questions:
 	@echo "Making topic-based questions JSON file to $(QUESTIONS_JSON_FILE)"
-	$(PYTHON) step2.0-topic-generation.py "$(FULL_PATH)" "$(QUESTIONS_JSON_FILE)" 200
+	$(PYTHON) step2.0-topic-generation.py "$(FULL_PATH)" "$(QUESTIONS_JSON_FILE)" $(TOPIC_COUNT)
 
 filter_english:
 	@echo "Filtering non-English questions, output in $(QUESTIONS_JSON_EN_FILE)"
