@@ -33,11 +33,11 @@ all: prepare_dir generate_questions filter_english extract_questions generate_da
 prepare_dir:
 	@echo "Dataset generating from: '$(FOLDER_NAME)' to '$(OUT_PATH)'"
 	mkdir -p $(OUT_PATH)
-	@notify-send -u critical "Tasks Complete" "The Makefile tasks have finished."
 
 generate_questions:
 	@echo "Making topic-based questions JSON file to $(QUESTIONS_JSON_FILE)"
 	$(PYTHON) step2.0-topic-generation.py "$(FULL_PATH)" "$(QUESTIONS_JSON_FILE)" $(TOPIC_COUNT)
+	@notify-send -u critical "Tasks Complete" "$(QUESTIONS_JSON_FILE) questions generated"
 
 filter_english:
 	@echo "Filtering non-English questions, output in $(QUESTIONS_JSON_EN_FILE)"
@@ -50,6 +50,7 @@ extract_questions:
 generate_danswer_dataset:
 	@echo "Making danswer-based dataset, saved to $(GS_JSON_FILE)"
 	$(PYTHON) step3.0-generate-danswer-dataset.py "$(QUESTIONS_TXT_FILE)" "$(GS_JSON_FILE)"
+	@notify-send -u critical "Tasks Complete" "$(GS_JSON_FILE) Goldenset dataset generated"
 
 convert_to_xls:
 	@echo "Converting $(GS_JSON_FILE) to $(OUT_XLS_FILE)"
