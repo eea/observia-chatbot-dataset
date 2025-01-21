@@ -271,7 +271,13 @@ if __name__ == "__main__":
                 questions.append(line.strip())
 
     dataset = make_dataset(questions)
-    out = {"question": [], "answer": [], "contexts": [], "ground_truths": []}
+    out = {
+        "question": [],
+        "answer": [],
+        "contexts": [],
+        "ground_truths": [],
+        "urls": [],
+    }
     for line in dataset:
         for k, v in line.items():
             out[k].append(v)
