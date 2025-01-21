@@ -33,6 +33,7 @@ all: prepare_dir generate_questions filter_english extract_questions generate_da
 prepare_dir:
 	@echo "Dataset generating from: '$(FOLDER_NAME)' to '$(OUT_PATH)'"
 	mkdir -p $(OUT_PATH)
+	@notify-send -u critical "Tasks Complete" "The Makefile tasks have finished."
 
 generate_questions:
 	@echo "Making topic-based questions JSON file to $(QUESTIONS_JSON_FILE)"
