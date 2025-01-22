@@ -122,17 +122,17 @@ def load_trulens(in_data):
             name="Relevance COT",
         ).on_input_output()
 
-        # See https://www.trulens.org/component_guides/evaluation/feedback_selectors/selecting_components/
-        f_custom = (
-            Feedback(custom_feedback, name="Custom feedback")
-            .on_input_output()
-            # .on(
-            #     Select.RecordCalls.retriever.args.query
-            # )
-            .on(Select.RecordCalls.retriever.rets)
-        )
+        # # See https://www.trulens.org/component_guides/evaluation/feedback_selectors/selecting_components/
+        # f_custom = (
+        #     Feedback(custom_feedback, name="Custom feedback")
+        #     .on_input_output()
+        #     # .on(
+        #     #     Select.RecordCalls.retriever.args.query
+        #     # )
+        #     .on(Select.RecordCalls.retriever.rets)
+        # )
 
-        feedbacks = [f_coherence, f_relevance, f_custom]
+        feedbacks = [f_coherence, f_relevance]
         virtual_app = VirtualApp()
 
         tru_recorder = TruVirtual(
@@ -145,8 +145,6 @@ def load_trulens(in_data):
 
         for i, record in enumerate(records):
             tru_recorder.add_record(record)
-            if i > 10:
-                break
 
             # .on_input()
             # .on(context)
