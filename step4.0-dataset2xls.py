@@ -3,7 +3,7 @@ import json
 import pandas as pd
 
 
-def json_to_excel(json_file, excel_file):
+def json_to_excel(json_file, out_path):
     with open(json_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -17,19 +17,27 @@ def json_to_excel(json_file, excel_file):
 
     df = pd.DataFrame(rows, columns=["Question", "Answer", "Ground Truth", "URLs"])
 
-    df.to_excel(excel_file, index=False, engine="openpyxl")
+    df.to_excel(out_path, index=False, engine="openpyxl")
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="Convert a JSON file to an Excel file."
     )
-    parser.add_argument("input", help="Path to the input JSON file.")
-    parser.add_argument("output", help="Path to the output Excel file.")
+    parser.add_argument(
+        "input",
+        nargs="+",
+        help="Input JSON file paths. Accepts multiple files",
+    )
+
+    # parser.add_argument("output", help="Path to the output Excel file.")
     args = parser.parse_args()
 
-    json_to_excel(args.input, args.output)
-    print(f"Excel file '{args.output}' has been created.")
+    for path in args.input:
+        output = f"{path.split('json')[0]}xls"
+        json_to_excel(path, output)
+
+        print(f"Excel file '{output}' has been created.")
 
 
 if __name__ == "__main__":
