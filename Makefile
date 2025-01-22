@@ -11,7 +11,7 @@ QUESTIONS_JSON_FILE := $(OUT_PATH)/$(FOLDER_NAME).json
 QUESTIONS_JSON_EN_FILE := $(OUT_PATH)/$(FOLDER_NAME)-en.json
 QUESTIONS_TXT_FILE := $(OUT_PATH)/$(FOLDER_NAME).txt
 GS_JSON_FILE := $(OUT_PATH)/$(FOLDER_NAME)-goldenset.json
-OUT_XLS_FILE := $(OUT_PATH)/$(FOLDER_NAME)-goldenset.xls
+# OUT_XLS_FILE := $(OUT_PATH)/$(FOLDER_NAME)-goldenset.xls
 
 FILE_COUNT := $(shell find "$(FULL_PATH)" -type f | wc -l)
 TOPIC_COUNT := $(shell echo $$(( $$(( $(FILE_COUNT) / 10 )) > 200 ? 200 : $$(( $(FILE_COUNT) / 10 )) )))
@@ -52,7 +52,11 @@ generate_danswer_dataset:
 	$(PYTHON) step3.0-generate-danswer-dataset.py "$(QUESTIONS_TXT_FILE)" "$(GS_JSON_FILE)"
 	@notify-send -u critical "Tasks Complete" "$(GS_JSON_FILE) Goldenset dataset generated"
 
+clean_danswer_dataset:
+	@echo "Cleaning Danswer dataset $(GS_JSON_FILE)"
+	$(PYTHON) step3.1-optimize-danswer-dataset.py "$(GS_JSON_FILE)"
+	@notify-send -u critical "Tasks Complete" "Cleaned Danswer Dataset $(GS_JSON_FILE)"
+
 convert_to_xls:
 	@echo "Converting $(GS_JSON_FILE) to $(OUT_XLS_FILE)"
-	$(PYTHON) step4.0-dataset2xls.py "$(GS_JSON_FILE)" "$(OUT_XLS_FILE)"
-
+	$(PYTHON) step4.0-dataset2xls.py "$(GS_JSON_FILE)"
