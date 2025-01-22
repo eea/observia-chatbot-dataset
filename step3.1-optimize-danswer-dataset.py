@@ -72,7 +72,7 @@ def clean_records(df, llm_client, max_count=60):
     text = "\n".join(questions)
     resp = make_llm_call(sys_message, text, model, llm_client)
     new_questions = resp.split("\n")
-    print(f"Received {len(new_questions)} questions")
+    print(f"Received {len(new_questions)} questions, of which we'll use {max_count}")
     clean_df = df.loc[df["question"].isin(new_questions)]
     return clean_df.head(max_count)
 
@@ -96,6 +96,7 @@ if __name__ == "__main__":
 
     data = load_dataset(args.input)
     for path in data:
+        print(f"Optimizing {path}")
         df = data[path]
 
         clean_df = clean_records(df, llm_client, args.max_count)
