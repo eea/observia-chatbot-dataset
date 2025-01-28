@@ -259,11 +259,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate goldenset dataset based on Danswer"
     )
+    parser.add_argument(
+      "--persona_id",
+      type=int,
+      help="The assistant id to be used to generate the dataset",
+      default=None
+    )
+
     parser.add_argument("input_file", help="Path to input questions text file")
     parser.add_argument("output_file", help="Path to output dataset JSON file")
 
     args = parser.parse_args()
 
+    conf = conf._replace(persona_id = args.persona_id or conf.persona_id)
+    print(f"persona_id: {conf.persona_id}")
     questions = []
     with open(args.input_file) as f:
         for line in f.readlines():

@@ -5,6 +5,7 @@ PYTHON = poetry run python
 FULL_PATH := $(strip $(dir))
 OUT_PATH = $(strip $(out_dir))
 FOLDER_NAME := $(notdir $(patsubst %/,%,$(FULL_PATH)))
+PERSONA_ID := $(strip $(persona_id))
 
 # Output files
 QUESTIONS_JSON_FILE := $(OUT_PATH)/$(FOLDER_NAME).json
@@ -27,8 +28,11 @@ else
 $(error Usage: make dir=<directory> out_dir=<out_directory>)
 endif
 
+
 # Targets
 all: prepare_dir generate_questions filter_english extract_questions generate_danswer_dataset convert_to_xls
+
+check: generate_danswer_dataset convert_to_xls
 
 prepare_dir:
 	@echo "Dataset generating from: '$(FOLDER_NAME)' to '$(OUT_PATH)'"
@@ -49,7 +53,7 @@ extract_questions:
 
 generate_danswer_dataset:
 	@echo "Making danswer-based dataset, saved to $(GS_JSON_FILE)"
-	$(PYTHON) step3.0-generate-danswer-dataset.py "$(QUESTIONS_TXT_FILE)" "$(GS_JSON_FILE)"
+	$(PYTHON) step3.0-generate-danswer-dataset.py "$(QUESTIONS_TXT_FILE)" "$(GS_JSON_FILE)" $(if $(PERSONA_ID),--persona_id $(PERSONA_ID),)
 	@notify-send -u critical "Tasks Complete" "$(GS_JSON_FILE) Goldenset dataset generated"
 
 clean_danswer_dataset:
