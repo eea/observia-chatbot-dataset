@@ -15,6 +15,7 @@ langid = "^1.1.6"
 langchain-together = "^0.3.0"
 pyvespa = "^0.52.0"
 openpyxl = "^3.1.5"
+langfuse = "^2.59.7"
 
 
 [build-system]
