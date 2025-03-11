@@ -1,3 +1,4 @@
 data-download/
 settings.json
 default.sqlite
+.env
