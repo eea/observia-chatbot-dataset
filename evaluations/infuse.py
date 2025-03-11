@@ -13,6 +13,8 @@ langfuse = Langfuse(
     host=os.environ["LANGFUSE_HOST"],
 )
 
+with open("evaluation_config-small.json", "r") as f:
+    evaluation_criteria = json.load(f)["evaluation_criteria"]
 
 def evaluate_response_req(question, answer):
     """
