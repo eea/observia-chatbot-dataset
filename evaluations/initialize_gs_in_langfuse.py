@@ -1,7 +1,8 @@
 import json
+import os
+
 import pandas as pd
 from langfuse import Langfuse
-import os
 
 langfuse = Langfuse(
     secret_key=os.environ["LANGFUSE_SECRET_KEY"],
