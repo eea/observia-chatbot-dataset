@@ -1,11 +1,13 @@
-import os
 import datetime
+import json
+import os
+import time
 
+import openai
 from dotenv import load_dotenv
-
 from langfuse import Langfuse
 
-load_dotenv()
+_ = load_dotenv()
 
 langfuse = Langfuse(
     secret_key=os.environ["LANGFUSE_SECRET_KEY"],
@@ -43,7 +45,7 @@ def make_prompt(criterion, question, answer):
             question=question, response=answer) + "\n"
     )
 
-    for i, label in enumerate(criterion["score_labels"]):
+    for i, label in enumerate(criterion["scale_labels"]):
         sys_prompt += f"{i}: {label}\n"
 
     user_prompt = criterion["user_prompt"].format(
@@ -62,7 +64,7 @@ def evaluate_response_req(question, answer, llm_client):
         sys_prompt, user_prompt = make_prompt(criterion, question, answer)
 
         try:
-            resp = make_llm_call(
+            llm_response = make_llm_call(
                 sys_prompt, user_prompt, model=model, llm_client=llm_client
             ).strip()
         except Exception as e:
@@ -96,25 +98,22 @@ def main():
     )
 
     for idx, trace in enumerate(traces.data):
-        # if trace.id in ["88f8ce1d-2c79-41f9-b672-20c6a9e6e5b0", "3c897c61-5e0d-4b78-b8bb-b0b5065fecb0"]:
-        #     print("already done, skip")
-        #     continue
-
         print("----")
         print(idx)
         print("----")
         print(trace.id)
         question = trace.input["question"]
         answer = trace.output["answer"]
-        print(question)
-        #    print(answer)
+        print(f"Question: {question}")
+        print(answer)
         scores = evaluate_response_req(question, answer, llm_client)
+        print(scores)
 
-        # for score in scores.keys():
-        #     langfuse.score(trace_id=trace.id, name=score,
-        #                    value=str(scores[score]))
+        for score in scores.keys():
+            pass
+            #     langfuse.score(trace_id=trace.id, name=score,
+            #                    value=str(scores[score]))
 
-        #        print(score)
         #        print(scores[score])
         now = datetime.datetime.now()
         print(now)
