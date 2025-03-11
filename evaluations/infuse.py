@@ -9,12 +9,6 @@ from langfuse import Langfuse
 
 _ = load_dotenv()
 
-langfuse = Langfuse(
-    secret_key=os.environ["LANGFUSE_SECRET_KEY"],
-    public_key=os.environ["LANGFUSE_PUBLIC_KEY"],
-    host=os.environ["LANGFUSE_HOST"],
-)
-
 API_KEY = os.environ["API_KEY"]
 API_URL = os.environ["API_URL"]
 
@@ -34,7 +28,6 @@ def make_llm_call(sys_message, text, model, llm_client):
         ],
         stream=False,
     )
-    # import pdb; pdb.set_trace()
     return response.choices[0].message.content
 
 
@@ -86,6 +79,12 @@ def evaluate_response_req(question, answer, llm_client):
 
 
 def main():
+    langfuse = Langfuse(
+        secret_key=os.environ["LANGFUSE_SECRET_KEY"],
+        public_key=os.environ["LANGFUSE_PUBLIC_KEY"],
+        host=os.environ["LANGFUSE_HOST"],
+    )
+
     traces = langfuse.fetch_traces(session_id="GS")
     # print (traces.data)
 
