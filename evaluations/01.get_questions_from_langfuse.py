@@ -1,7 +1,17 @@
 import json
 import os
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", help="Path to config file")
+args = parser.parse_args()
+
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
+
+if args.config:
+    load_dotenv(args.config, override=True)
+
 import utils
 
 GS_ORIG = os.environ["LANGFUSE_GOLDENSET_ORIGINAL"]

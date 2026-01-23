@@ -6,8 +6,20 @@ from vespa.application import Vespa
 from langchain_together.chat_models import ChatTogether
 from langchain.schema import HumanMessage
 
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", help="Path to config file")
+args = parser.parse_args()
+
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
+
+
+if args.config:
+    load_dotenv(args.config, override=True)
+
 
 logger = logging.getLogger("qa")
 logger.setLevel(logging.INFO)  # Set the default logging level for the logger
@@ -39,13 +51,12 @@ def get_login_cookie():
     url = f"{danswer_url}/api/auth/login"
     data = {
         "username": danswer_username,
-        "password": danswer_password,
-        "scope": "",
-        "client_id": "",
-        "client_secret": "",
-        "grant_type": "",
+        "password": danswer_password
     }
-    resp = requests.post(url, data)
+    headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+    resp = requests.post(url, data, headers)
     cookie = resp.headers["set-cookie"]
     return cookie
 
@@ -309,7 +320,7 @@ if __name__ == "__main__":
         for line in f:
             questions.append(json.loads(line).get("question",""))  # Convert JSON string to dictionary
 
-    dataset = make_dataset(questions[:2])
+    dataset = make_dataset(questions)
     out = {
         "question": [],
         "answer": [],
