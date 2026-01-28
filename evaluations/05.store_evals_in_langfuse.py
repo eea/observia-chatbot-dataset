@@ -3,8 +3,18 @@ from langfuse import Langfuse
 
 from utils import load_jsonl
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", help="Path to config file")
+args = parser.parse_args()
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
+
+
+if args.config:
+    load_dotenv(args.config, override=True)
+
 
 jsons_folder = os.environ.get('JSONS_FOLDER', 'tmp')
 
@@ -39,13 +49,18 @@ def score_trace(trid, scores):
 def store_in_langfuse(sets):
     session = f"Goldenset {langfuse_session_name_suffix}"
     print(session)
+#    return
     cnt = 0
+#    import pdb; pdb.set_trace()
     for row in sets:
         print(cnt)
         cnt+=1
         question = row.get("question")
-        contexts = row.get("context")
+        contexts = row.get("contexts")
         answer = row.get("answer")
+#        print(row.get("ragas_evals"))
+#        print(row.get("custom_evals"))
+#        print("---")
         trace = init_trace(query=question, response=answer, context=contexts, session=session)
         score_trace(trid=trace.id, scores=row.get("ragas_evals"))
         score_trace(trid=trace.id, scores=row.get("custom_evals"))

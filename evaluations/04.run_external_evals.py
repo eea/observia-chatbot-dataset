@@ -6,8 +6,19 @@ import time
 
 from utils import load_jsonl
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", help="Path to config file")
+args = parser.parse_args()
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
+
+
+if args.config:
+    load_dotenv(args.config, override=True)
+
+
 
 jsons_folder = os.environ.get('JSONS_FOLDER', 'tmp')
 
@@ -46,6 +57,7 @@ def evaluate_response_req(question, answer):
             "Content-Type": "application/json"
         }
         try:
+#            import pdb; pdb.set_trace()
             response = requests.post(f"{external_llm_host}/chat/completions", json=payload, headers=headers)
             response_json = response.json()
             llm_response = response_json["choices"][0]["message"]["content"].strip()
@@ -94,6 +106,6 @@ def eval_external(data):
             f.write(json.dumps(res) + "\n")
 
 if __name__ == "__main__":
-    qas = load_jsonl(json.path.join(jsons_folder, "02.qa.jsonl"))
+    qas = load_jsonl(os.path.join(jsons_folder, "02.qa.jsonl"))
 
     eval_external(qas)

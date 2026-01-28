@@ -12,8 +12,17 @@ from ragas.metrics import  Faithfulness, LLMContextPrecisionWithoutReference, Re
 
 from utils import load_jsonl
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--config", help="Path to config file")
+args = parser.parse_args()
+
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
+
+
+if args.config:
+    load_dotenv(args.config, override=True)
 
 
 jsons_folder = os.environ.get('JSONS_FOLDER', 'tmp')
@@ -72,6 +81,5 @@ def eval_ragas(data, metrics, evaluator_llm):
 
 if __name__ == "__main__":
     metrics, evaluator_llm = init_metrics()
-    qas = load_jsonl(json.path.join(jsons_folder, "02.qa.jsonl"))
-    import pdb; pdb.set_trace()
+    qas = load_jsonl(os.path.join(jsons_folder, "02.qa.jsonl"))
     eval_ragas(qas, metrics, evaluator_llm)

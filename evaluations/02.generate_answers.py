@@ -30,50 +30,36 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 logger.addHandler(console_handler)
 console_handler.setFormatter(formatter)
 
-danswer_url = os.environ.get("DANSWER_URL")
-danswer_username = os.environ.get("DANSWER_USERNAME")
-danswer_password = os.environ.get("DANSWER_PASSWORD")
-danswer_password = os.environ.get("DANSWER_PASSWORD")
-danswer_persona_id = os.environ.get("DANSWER_PERSONA_ID")
+gptlab_url = os.environ.get("GPTLAB_URL")
+gptlab_api_key = os.environ.get("GPTLAB_API_KEY")
+gptlab_persona_id = os.environ.get("GPTLAB_PERSONA_ID")
 
+resp_style = os.environ.get("RESP_STYLE")
 
-danswer_custom_model = os.environ.get("DANSWER_CUSTOM_MODEL")
-danswer_custom_model_provider = os.environ.get("DANSWER_CUSTOM_MODEL_PROVIDER")
+gptlab_custom_model = os.environ.get("GPTLAB_CUSTOM_MODEL")
+gptlab_custom_model_provider = os.environ.get("GPTLAB_CUSTOM_MODEL_PROVIDER")
 
 vespa_host = os.environ.get("VESPA_HOST")
 app = Vespa(url=vespa_host)
 
+headers = {
+    "Authorization": f"Bearer {gptlab_api_key}"
+}
 
 together_ai_chat_model = os.environ.get("TOGETHER_AI_CHAT_MODEL")
 together_ai_key = os.environ.get("TOGETHER_AI_KEY")
 
-def get_login_cookie():
-    url = f"{danswer_url}/api/auth/login"
-    data = {
-        "username": danswer_username,
-        "password": danswer_password
-    }
-    headers = {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
-    resp = requests.post(url, data, headers)
-    cookie = resp.headers["set-cookie"]
-    return cookie
-
-
-def start_session(login_cookie=None):
-    url = f"{danswer_url}/api/chat/create-chat-session"
-    data = {"persona_id": danswer_persona_id, "description": "Test chat session"}
-    cookies = login_cookie or get_login_cookie()
-    resp = requests.post(url, json=data, headers={"Cookie": cookies})
+def start_session():
+    url = f"{gptlab_url}/api/chat/create-chat-session"
+    data = {"persona_id": gptlab_persona_id, "description": "Test chat session"}
+    resp = requests.post(url, json=data, headers=headers)
     data = resp.json()
     return data["chat_session_id"]
 
 
-def get_answer_with_citation(question, login_cookie=None):
-    url = f"{danswer_url}/api/chat/send-message"
-    cookies = login_cookie or get_login_cookie()
-    chat_session_id = start_session(login_cookie)
+def get_answer_with_citation(question, api_key=None):
+    url = f"{gptlab_url}/api/chat/send-message"
+    chat_session_id = start_session()
     body = {
         "chat_session_id": chat_session_id,
         "message": question,
@@ -83,17 +69,36 @@ def get_answer_with_citation(question, login_cookie=None):
         "prompt_id": 0,
         "search_doc_ids": [],
         "retrieval_options": {},
-        "llm_override": {"model_version":danswer_custom_model, "model_provider": danswer_custom_model_provider}
+        "llm_override": {"model_version":gptlab_custom_model, "model_provider": gptlab_custom_model_provider}
     }
     print(body)
-    resp = requests.post(url, json=body, headers={"Cookie": cookies})
+    resp = requests.post(url, json=body, headers=headers)
     lines = list(resp.iter_lines(decode_unicode=True))
 
-    msg = None
-    for line in lines:
-        _msg = json.loads(line)
-        if "message_id" in _msg:
-            msg = _msg
+    if resp_style == 'old':
+        msg = None
+        for line in lines:
+            _msg = json.loads(line)
+            if "message_id" in _msg:
+                msg = _msg
+    else:
+        msg_text = ''
+        citations = None
+        context_docs = []
+        for line in lines:
+            _msg = json.loads(line)
+            if (_msg.get("obj", {}).get("type","") == "message_delta"):
+                msg_text += _msg.get("obj", {}).get("content","")
+            if (_msg.get("obj", {}).get("type","") == "message_start"):
+                context_docs = _msg.get("obj", {}).get("final_documents",[])
+
+        if len(msg_text) > 0:
+            msg = {"message": msg_text}
+
+        msg["context_docs"] = {}
+        msg["context_docs"]["top_documents"] = context_docs
+        msg["citations"] = citations
+        #import pdb; pdb.set_trace()
 
     return msg
 
@@ -139,7 +144,6 @@ def get_answer(question):
     answer = msg["message"]
     citations = extract_cited_documents(msg)
     context = extract_context_documents(msg)
-
     rec = dict(answer=answer, citations=citations, context=context)
     return rec
 
